@@ -41,6 +41,58 @@ module.exports.process_msg = function (ws, data) {
     else if (data.type == 'get_company') {
         chaincode.query.query(['GetCompany', data.company], data.user, cb_got_company);					//(args, enrollID, callback)
     }
+    //EY <-
+    else if (data.type == 'get_assets') {
+        chaincode.query.query(['GetAllCPs', data.user], cb_got_assets);									//(args, enrollID, callback)
+    }
+    
+    //Callback func returning all wallet assets
+    function cb_got_assets(e, assets) {
+    	
+    	var bMock = true;
+    	//MOCK <-
+    	if (bMock) {
+    		
+    		var dIssueDate = Date.now().toString();
+    		var sAssets = '[{'  
+					+ '"cusip":			"QWERTY1234567890",' 
+					+ '"name":		 	"PROPERTY_1",'
+				    + '"adrStreet":   	"1/1 Street",'
+				    + '"adrCity":     	"Sydney",'
+				    + '"adrPostcode": 	"2000",'
+				    + '"adrState":    	"NSW",'
+				    + '"quantity":    	100,'
+				    + '"mktval":      	800000,'
+				    + '"buyval":      	0,'
+				    + '"owner":       	[{'
+				    + '	           			"invid":  "' + data.user + '",'
+				    + '            			"quantity":    80'
+				    + '             	}],'
+				    + '"forsale":     	[{'
+				    + '	           			"invid":  "' + data.user + '",'
+                    + '             		"quantity":    20'
+				    + '             	}],'
+				    + '"issuer":      "' + data.user + '",'
+                    + '"issueDate":   "' + dIssueDate
+                + '"}]';
+	    	console.log('assets', sAssets);
+	    	
+	        sendMsg({msg: 'assets', assets: sAssets});
+	    //MOCK ->
+    	
+    	} else {
+	    	
+	        if (e != null) {
+	            console.log('assets error', e);
+	        }
+	        else {
+	            console.log('assets', assets);
+	            sendMsg({msg: 'assets', assets: assets});
+	        }
+    	}
+
+    }
+    //EY ->
 
     function cb_got_papers(e, papers) {
         if (e != null) {

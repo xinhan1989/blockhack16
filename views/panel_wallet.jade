@@ -1,0 +1,56 @@
+#walletPanel(hidden).panel
+	h1 Wallet
+	hr
+	
+	br
+	#walletModal.modalDialog
+			div
+				.modal-header
+					h2 Filter assets
+					hr
+				.modal-content
+					form#walletFilter
+						label(for="asset_name") NAME
+						input#asset_name.wallet-filter(type="text" name="name")
+						br
+						label(for="asset_street") STREET
+						input#asset_street.wallet-filter(type="text" name="adrStreet")
+						br
+						label(for="asset_city") CITY
+						input#asset_city.wallet-filter(type="text" name="adrCity")
+						br
+						label(for="asset_postcode") PCODE
+						input#asset_postcode.wallet-filter(type="text" name="adrPostcode")
+						br
+						label(for="asset_state") STATE
+						input#asset_state.wallet-filter(type="text" name="adrState")
+						br
+						a.filter-button(href="#close" title="Close") Close
+						
+	#openWallets
+		br
+		p
+			span(style="font-weight:bold;") Account Balance:
+			span#accountBalance Loading from blockchain...
+		br
+		a.filter-button(href="#walletModal") Filter Assets
+		br
+		br
+		table#walletsTable.tablesorter
+			thead
+				tr 
+					TH: a.sort-selector(sort="date") DATE
+						span.fa.fa-arrow-up.sort-indicator
+					th: a.sort-selector(sort="cusip") CUSIP
+					th: a.sort-selector(sort="name") NAME
+					th: a.sort-selector(sort="adrStreet") STREET
+					th: a.sort-selector(sort="adrCity") CITY
+					th: a.sort-selector(sort="adrPostcode") POSTCODE
+					th: a.sort-selector(sort="adrState") STATE
+					th: a.sort-selector(sort="qtyOwned") QTY OWNED
+					th: a.sort-selector(sort="qty4Sale") QTY SALE
+					th: a.sort-selector(sort="mktval")  MARKET VALUE
+					th: a.sort-selector(sort="issuer")  ISSUER
+					th: a.sort-selector(sort="owner")  OWNER
+					th ACTION
+			tbody#walletsBody

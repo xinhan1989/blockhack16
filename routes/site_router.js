@@ -32,7 +32,7 @@ var TAG = "router:";
 // ============================================================================================================================
 router.route("/").get(function (req, res) {
     check_login(res, req);
-    res.render('part2', {title: 'Commercial Paper Demo', bag: {setup: setup, e: process.error, session: req.session}});
+    res.render('part2', {title: 'PropertyBlox Demo', bag: {setup: setup, e: process.error, session: req.session}});
 });
 
 router.route("/home").get(function (req, res) {
@@ -41,15 +41,15 @@ router.route("/home").get(function (req, res) {
 });
 router.route("/create").get(function (req, res) {
     check_login(res, req);
-    res.render('part2', {title: 'Commercial Paper Demo', bag: {setup: setup, e: process.error, session: req.session}});
+    res.render('part2', {title: 'PropertyBlox Demo', bag: {setup: setup, e: process.error, session: req.session}});
 });
 router.route("/trade").get(function (req, res) {
     check_login(res, req);
-    res.render('part2', {title: 'Commercial Paper Demo', bag: {setup: setup, e: process.error, session: req.session}});
+    res.render('part2', {title: 'PropertyBlox Demo', bag: {setup: setup, e: process.error, session: req.session}});
 });
 router.route("/audit").get(function (req, res) {
     check_login(res, req);
-    res.render('part2', {title: 'Commercial Paper Demo', bag: {setup: setup, e: process.error, session: req.session}});
+    res.render('part2', {title: 'PropertyBlox Demo', bag: {setup: setup, e: process.error, session: req.session}});
 });
 
 router.route("/login").get(function (req, res) {
@@ -68,6 +68,33 @@ router.route("/:page").post(function (req, res) {
         register(req, res);
     }
 });
+
+// ============================================================================================================================
+// EY code - start
+// ============================================================================================================================
+router.route("/createasset").get(function (req, res) {
+    check_login(res, req);
+    res.render('part2', {title: 'PropertyBlox Demo', bag: {setup: setup, e: process.error, session: req.session}});
+});
+router.route("/wallet").get(function (req, res) {
+    check_login(res, req);
+    res.render('part2', {title: 'PropertyBlox Demo', bag: {setup: setup, e: process.error, session: req.session}});
+});
+router.route("/walletasset").get(function (req, res) {
+    check_login(res, req);
+    res.render('part2', {title: 'PropertyBlox Demo', bag: {setup: setup, e: process.error, session: req.session}});
+});
+router.route("/buy").get(function (req, res) {
+    check_login(res, req);
+    res.render('part2', {title: 'PropertyBlox Demo', bag: {setup: setup, e: process.error, session: req.session}});
+});
+router.route("/buyasset").get(function (req, res) {
+    check_login(res, req);
+    res.render('part2', {title: 'PropertyBlox Demo', bag: {setup: setup, e: process.error, session: req.session}});
+});
+// ============================================================================================================================
+// EY code - end
+// ============================================================================================================================
 
 module.exports = router;
 

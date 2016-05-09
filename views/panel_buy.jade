@@ -1,0 +1,47 @@
+#buyPanel(hidden).panel
+	h1 Market Place
+	hr
+	
+	br
+	#buyModal.modalDialog
+			div
+				.modal-header
+					h2 Filter Trades
+					hr
+				.modal-content
+					form#buyFilter
+						label(for="buy_issuer") ISSUER
+						input#buy_issuer.buy-filter(type="text" name="issuer")
+						br
+						label(for="buy_owner") OWNER
+						input#buy_owner.buy-filter(type="text" name="owner")
+						br
+						label(for="buy_ticker") TICKER
+						input#buy_ticker.buy-filter(type="text" name="ticker")
+						br
+						a.filter-button(href="#close" title="Close") Close
+						
+	#openBuys
+		br
+		p
+			span(style="font-weight:bold;") Account Balance:
+			span#accountBalance Loading from blockchain...
+		br
+		a.filter-button(href="#buyModal") Filter buys
+		br
+		br
+		table#buysTable.tablesorter
+			thead
+				tr 
+					TH: a.sort-selector(sort="date") DATE
+						span.fa.fa-arrow-up.sort-indicator
+					th: a.sort-selector(sort="cusip") CUSIP
+					th: a.sort-selector(sort="ticker") TICKER
+					th: a.sort-selector(sort="par") PAR
+					th: a.sort-selector(sort="quantity") QTY
+					th: a.sort-selector(sort="discount") DISCOUNT
+					th: a.sort-selector(sort="maturity") MATURITY
+					th: a.sort-selector(sort="issuer") ISSUER
+					th: a.sort-selector(sort="owner") OWNER
+					th ACTION
+			tbody#buysBody

@@ -28,6 +28,23 @@ var panels = [
     }
 ];
 
+    //EY <-
+var asset_panels = [
+    {
+        name: "wallet",
+        formID: "walletFilter",
+        tableID: "#walletsBody",
+        filterPrefix: "wallet_"
+    },
+    {
+        name: "buy",
+        formID: "buyFilter",
+        tableID: "#buysBody",
+        filterPrefix: "buy_"
+    }
+    //EY ->
+];
+
 // =================================================================================
 // On Load
 // =================================================================================
@@ -48,6 +65,11 @@ $(document).on('ready', function () {
         } else if (user.username) {
             $("#createLink").show();
             $("#tradeLink").show();
+            $("#createassetLink").show(); 	//EY
+			$("#walletLink").show();			//EY
+			$("#walletassetLink").show(); 	//EY the link will be moved to an asset entry in wallet panel
+			$("#buyLink").show();			//EY
+			$("#buyassetLink").show();		//EY the link will be moved to a asset entry in buy panel
         }
     } else {
 
@@ -85,7 +107,45 @@ $(document).on('ready', function () {
         }
         return false;
     });
-
+    
+    //EY <-
+    $("#submitasset").click(function () { 
+        if (user.username) {
+        	var sId = user.name + Date.now().toString() + randStr(10);
+            var obj = {
+                type: "createasset",
+                asset: {
+					cusip:		 sId.toUpperCase(),
+					name:		 escapeHtml($("input[name='name']").val()),
+				    adrStreet:   escapeHtml($("input[name='adrStreet']").val()),
+				    adrCity:     escapeHtml($("input[name='adrCity']").val()),
+				    adrPostcode: escapeHtml($("input[name='adrPostcode']").val()),
+				    adrState:    escapeHtml($("select[name='adrState']").val()),
+				    quantity:    Number($("input[name='qty']").val()),
+				    mktval:      Number($("input[name='mktValue']").val()),
+				    buyval:      0,
+				    owner:       [{
+				    	           investorID:  user.name,
+                                   quantity:    Number($("input[name='qty']").val())
+				                 }],
+				    forsale:     [],
+				    issuer:      user.name,
+                    issueDate:   Date.now().toString()
+                },
+                user: user.username
+            };
+            if (obj.asset && obj.asset.name) {
+                obj.asset.name = obj.asset.name.toUpperCase();
+                console.log('creating asset, sending', obj);
+                ws.send(JSON.stringify(obj));
+                $(".panel").hide();
+                $("#walletPanel").show();
+            }
+        }
+        return false;
+    });
+    //EY ->
+    
     $("#createLink").click(function () {
         $("input[name='name']").val('r' + randStr(6));
     });
@@ -115,6 +175,13 @@ $(document).on('ready', function () {
         console.log("Change in audit filter detected.");
         processFilterForm(panels[1]);
     });
+    //EY <-
+    $(".wallet-filter").keyup(function () {
+        "use strict";
+        console.log("Change in wallet filter detected.");
+        processFilterForm(asset_panels[0]);
+    });
+    //EY ->
 
     // Click events for the columns of the table
     $('.sort-selector').click(function () {
@@ -145,6 +212,11 @@ $(document).on('ready', function () {
         for (var i in panels) {
             build_trades(bag.papers, panels[i]);
         }
+        //EY <-
+        for (var i in panels) {
+            build_assets(bag.assets, asset_panels[i]);
+        }
+        //EY ->
     });
 
     //trade events
@@ -173,6 +245,34 @@ $(document).on('ready', function () {
             $("#notificationPanel").animate({width: 'toggle'});
         }
     });
+    
+     //EY <- View Wallet Asset Details
+    $(document).on("click", ".walletAssetDetails", function () {
+        if (user.username) {
+            console.log('wallet asset...');
+            var i = $(this).attr('trade_pos');
+            var cusip = $(this).attr('data_cusip');
+            var issuer = $(this).attr('data_issuer');
+
+            // TODO Map the trade_pos to the correct button
+            var msg = {
+                type: 'transfer_paper',
+                transfer: {
+                    //CUSIP: bag.papers[i].cusip,
+                    //fromCompany: bag.papers[i].issuer,
+                    CUSIP: cusip,
+                    fromCompany: issuer,
+                    toCompany: user.name,
+                    quantity: 1
+                },
+                user: user.username
+            };
+            console.log('sending', msg);
+            ws.send(JSON.stringify(msg));
+            //$("#notificationPanel").animate({width: 'toggle'});
+        }
+    });
+    //EY ->
 });
 
 
@@ -224,6 +324,11 @@ function connect_to_server() {
         $("#errorNotificationPanel").fadeOut();
         ws.send(JSON.stringify({type: "chainstats", v: 2, user: user.username}));
         ws.send(JSON.stringify({type: "get_papers", v: 2, user: user.username}));
+        
+        //EY <-
+        ws.send(JSON.stringify({type: "get_assets", v: 2, user: user.username}));
+        //EY ->
+        
         if (user.name && user.role !== "auditor") {
             ws.send(JSON.stringify({type: 'get_company', company: user.name, user: user.username}));
         }
@@ -255,6 +360,19 @@ function connect_to_server() {
 					console.log('cannot parse papers', e);
 				}
 			}
+			//EY <-
+			else if (data.msg === 'assets') {
+				try{
+					var assets = JSON.parse(data.assets);
+					for (var i in asset_panels) {
+						build_assets(assets, asset_panels[i]);
+					}
+				}
+				catch(e){
+					console.log('cannot parse assets', e);
+				}
+			}
+			//EY ->
 			else if (data.msg === 'chainstats') {
 				//console.log(JSON.stringify(data));
 				var e = formatDate(data.blockstats.transactions[0].timestamp.seconds * 1000, '%M/%d/%Y &nbsp;%I:%m%P');
@@ -425,6 +543,131 @@ function build_trades(papers, panelDesc) {
         $(panelDesc.tableID).html(html);
     }
 }
+
+/**
+ * Process the list of assets from the server and displays them in the wallet list..
+ * This function builds the tables for multiple panels, so an object is needed to
+ * identify which table it should be drawing to.
+ * @param papers The list of trades to display.
+ * @param panelDesc An object describing what panel the assets are being shown in.
+ */
+function build_assets(assets, panelDesc) {
+
+    if(!user.name)
+    bag.wallet_assets = assets;						//store the assets for posterity
+    //console.log('papers:', bag.papers);
+
+    if(assets && assets.length > 0) {
+    	
+        // If no panel is given, assume this is the wallet panel
+        if (!panelDesc) {
+            panelDesc = asset_panels[0];
+        }    	
+
+        // Break the assets down into entries
+        console.log('breaking assets into individual entries');
+        var entries = [];
+        for (var asset in assets) {
+        	var broken_up = {};
+        	if (panelDesc.name === "wallet")
+              	broken_up = wallet_asset_to_entries(assets[asset], user);
+            else if (panelDesc.name === "buy") {
+				broken_up = buy_asset_to_entries(assets[asset]);            	
+            }
+            entries = entries.concat(broken_up);
+        }
+        console.log("Displaying", assets.length, "assets as", entries.length, "entries");
+
+        entries.sort(sort_selected);
+        if (sort_reversed) entries.reverse();
+
+        // Display each entry as a row in the table
+        var rows = [];
+        for (var i in entries) {
+            console.log('!', entries[i]);
+
+            if (entries[i].qtyOwned > 0) {													//cannot buy when there are none
+
+                if (excluded(entries[i], filter)) {
+                    var style;
+                    if (user.name.toLowerCase() === entries[i].owner.toLowerCase()) {
+                        //cannot buy my own stuff
+                        style = 'invalid';
+                    }
+                    else if (entries[i].issuer.toLowerCase() !== entries[i].owner.toLowerCase()) {
+                        //cannot buy stuff already bought
+                        style = 'invalid';
+                    } else {
+                        style = null;
+                    }
+
+                    // Create a row for each valid asset
+                    if (panelDesc.name === "wallet") {
+	                    var data = [
+	                        formatDate(Number(entries[i].issueDate), '%M/%d %I:%m%P'),
+	                        entries[i].cusip,
+	                        escapeHtml(entries[i].name.toUpperCase()),
+	                        escapeHtml(entries[i].adrStreet),
+	                        escapeHtml(entries[i].adrCity),
+	                        escapeHtml(entries[i].adrPostcode),
+	                        escapeHtml(entries[i].adrState),
+	                        entries[i].qtyOwned,
+	                        entries[i].qty4Sale,
+	                        formatMoney(entries[i].mktval),
+	                        entries[i].issuer,
+	                        entries[i].owner];
+                	} else if (panelDesc.name === "buy") {
+                		
+            		}
+
+                    var row = createRow(data);
+                    style = null;
+                    style && row.classList.add(style);
+
+                    // Only the trade panel should allow you to interact with trades
+                    if (panelDesc.name === "wallet") {
+                        var disabled = false;
+                        var button = walletAssetButton(disabled, entries[i].cusip, entries[i].issuer);
+                        row.appendChild(button);
+                    }
+                    rows.push(row);
+                }
+            }
+
+        }
+
+        // Placeholder for an empty table
+        var html = '';
+        if (rows.length == 0) {
+            if (panelDesc.name === 'wallet')
+                html = '<tr><td>nothing here...</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
+            else if (panelDesc.name === 'audit')
+                html = '<tr><td>nothing here...</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>'; // No action column
+            $(panelDesc.tableID).html(html);
+        } else {
+            // Remove the existing table data
+            console.log("clearing existing table data");
+            var tableBody = $(panelDesc.tableID);
+            tableBody.empty();
+
+
+            // Add the new rows to the table
+            console.log("populating new table data");
+            var row;
+            while (rows.length > 0) {
+                row = rows.shift();
+                tableBody.append(row);
+            }
+        }
+    } else {
+        if (panelDesc.name === 'wallet')
+            html = '<tr><td>nothing here...</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
+        else if (panelDesc.name === 'audit')
+            html = '<tr><td>nothing here...</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>'; // No action column
+        $(panelDesc.tableID).html(html);
+    }
+}
+
 
 // =================================================================================
 //	Helpers for the filtering of trades

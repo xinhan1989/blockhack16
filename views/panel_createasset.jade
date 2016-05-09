@@ -1,0 +1,43 @@
+#createassetPanel(hidden).panel
+	h1 Create Asset
+	hr
+	
+	#innerWrap
+		span.fa.fa-home(style="font-size: 250px; float:left;")
+		
+		form(action="/createasset" method="POST")#createassetform
+			legend 
+				input(type="text" name="name")
+				span.hint NAME
+			legend 
+				input(type="text" name="adrStreet")
+				span.hint STREET ADDRESS
+			legend 
+				input(type="text" name="adrCity")
+				span.hint CITY
+			legend 
+				input(type="number" name="adrPostcode")
+				span.hint POSTCODE
+			legend 
+				select(name="adrState")
+					option(value="NSW") New South Wales
+					option(value="ACT") Australian Capital Territory
+					option(value="VIC") Victoria
+					option(value="QLD") Queensland
+					option(value="SA") South Australia
+					option(value="WA") Western Australia
+					option(value="NT") Northern Territory
+					option(value="TAS") Tasmania
+				span.hint STATE
+			legend 
+				input(type="number" name="qty" value="100")
+				span.hint TOKENS QTY
+			legend 
+				input(type="number" name="mktValue" placeholder="AUD")
+				span.hint MARKET VALUE
+			
+			legend
+				button(type="button" style="margin:5px;")#submitasset
+					span.fa.fa-check &nbsp;&nbsp;
+					span CREATE
+				

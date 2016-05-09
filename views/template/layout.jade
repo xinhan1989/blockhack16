@@ -40,11 +40,12 @@ html
 				//Tab Navigation, show the corresponding panel
 				$(".nav").click(function(){
 					var show = $(this).html().trim().toLowerCase();
+					var show = show.replace(" ", ""); //EY - remove space in the link name
 					showPanel(show);
 				});
 				function showPanel(show){
 					console.log('show', show);
-					if(show == '') show = 'trade';									//default
+					if(show == '') show = 'wallet';									//default
 					window.history.pushState({},'', show);					//put it in url so we can f5
 
 					$(".panel").hide();

@@ -330,6 +330,12 @@ label {
   float: left;
   margin-left: 40px;
   margin-top: 40px; }
+  
+/* EY */
+#createassetform {
+  float: left;
+  margin-left: 40px;
+  margin-top: 40px;   
 
 .createLegend {
   width: 45px;
