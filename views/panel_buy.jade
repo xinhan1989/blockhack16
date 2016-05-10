@@ -1,23 +1,29 @@
 #buyPanel(hidden).panel
-	h1 Market Place
+	h1 Property for Sale
 	hr
 	
 	br
 	#buyModal.modalDialog
 			div
 				.modal-header
-					h2 Filter Trades
+					h2 Filter assets
 					hr
 				.modal-content
 					form#buyFilter
-						label(for="buy_issuer") ISSUER
-						input#buy_issuer.buy-filter(type="text" name="issuer")
+						label(for="asset_name") NAME
+						input#asset_name.wallet-filter(type="text" name="name")
 						br
-						label(for="buy_owner") OWNER
-						input#buy_owner.buy-filter(type="text" name="owner")
+						label(for="asset_street") STREET
+						input#asset_street.wallet-filter(type="text" name="adrStreet")
 						br
-						label(for="buy_ticker") TICKER
-						input#buy_ticker.buy-filter(type="text" name="ticker")
+						label(for="asset_city") CITY
+						input#asset_city.wallet-filter(type="text" name="adrCity")
+						br
+						label(for="asset_postcode") PCODE
+						input#asset_postcode.wallet-filter(type="text" name="adrPostcode")
+						br
+						label(for="asset_state") STATE
+						input#asset_state.wallet-filter(type="text" name="adrState")
 						br
 						a.filter-button(href="#close" title="Close") Close
 						
@@ -27,7 +33,7 @@
 			span(style="font-weight:bold;") Account Balance:
 			span#accountBalance Loading from blockchain...
 		br
-		a.filter-button(href="#buyModal") Filter buys
+		a.filter-button(href="#buyModal") Filter Assets
 		br
 		br
 		table#buysTable.tablesorter
@@ -36,12 +42,14 @@
 					TH: a.sort-selector(sort="date") DATE
 						span.fa.fa-arrow-up.sort-indicator
 					th: a.sort-selector(sort="cusip") CUSIP
-					th: a.sort-selector(sort="ticker") TICKER
-					th: a.sort-selector(sort="par") PAR
-					th: a.sort-selector(sort="quantity") QTY
-					th: a.sort-selector(sort="discount") DISCOUNT
-					th: a.sort-selector(sort="maturity") MATURITY
-					th: a.sort-selector(sort="issuer") ISSUER
-					th: a.sort-selector(sort="owner") OWNER
+					th: a.sort-selector(sort="name") NAME
+					th: a.sort-selector(sort="adrStreet") STREET
+					th: a.sort-selector(sort="adrCity") CITY
+					th: a.sort-selector(sort="adrPostcode") POSTCODE
+					th: a.sort-selector(sort="adrState") STATE
+					th: a.sort-selector(sort="qtyOwned") OWNED BY YOU
+					th: a.sort-selector(sort="qty4Sale") FOR SALE
+					th: a.sort-selector(sort="mktval")  MARKET VALUE
+					th: a.sort-selector(sort="issuer")  ISSUER
 					th ACTION
 			tbody#buysBody

@@ -31,3 +31,9 @@ type Account struct {
     CashBalance float64  `json:"cashBalance"`
     AssetsIds   []string `json:"assetIds"`
 }
+
+type SetForSale {
+	CUSIP       string   `json:"cusip"`
+	FromCompany string   `json:"fromCompany"`
+	Quantity    int      `json:"quantity"`
+}

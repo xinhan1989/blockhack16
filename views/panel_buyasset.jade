@@ -1,5 +1,5 @@
 #buyassetPanel(hidden).panel
-	h1 View Asset
+	h1 For Sale Asset Details
 	hr
 	
 	#innerWrap
@@ -13,31 +13,32 @@
 				input(type="text" name="adrStreet" readonly="true")
 				span.hint STREET ADDRESS
 			legend 
-				input(type="text" name="adrCity")
+				input(type="text" name="adrCity" readonly="true")
 				span.hint CITY
 			legend 
-				input(type="number" name="adrPostcode")
+				input(type="number" name="adrPostcode" readonly="true")
 				span.hint POSTCODE
 			legend 
-				select(name="adrState")
-					option(value="NSW") New South Wales
-					option(value="ACT") Australian Capital Territory
-					option(value="VIC") Victoria
-					option(value="QLD") Queensland
-					option(value="SA") South Australia
-					option(value="WA") Western Australia
-					option(value="NT") Northern Territory
-					option(value="TAS") Tasmania
+				input(type="text" name="adrState" readonly="true")
 				span.hint STATE
 			legend 
-				input(type="number" name="tknQty" value="100")
-				span.hint TOKENS QTY
-			legend 
-				input(type="number" name="mktValue" placeholder="AUD")
+				input(type="text" name="mktValue" readonly="true")
 				span.hint MARKET VALUE
-			
-			legend
-				button(type="button" style="margin:5px;")#submit
-					span.fa.fa-check &nbsp;&nbsp;
-					span CREATE
+			legend 
+				input(type="text" name="issuer" readonly="true")
+				span.hint ISSUER
+			legend 
+				input(type="text" name="issueDate" readonly="true")
+				span.hint ISSUE	DATE
+				
+			br
+			br
+			table#buyAssetTable
+				thead
+					tr 
+						th INVESTOR
+						th FOR SALE
+						th TO BUY 
+						th ACTION
+				tbody#buyAssetBody
 				

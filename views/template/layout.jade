@@ -76,6 +76,10 @@ html
 					//});
 					$("#notificationPanel").animate({width:'toggle'});
 				});
+				//Notification panel
+				$("#closeCustomNotification").click(function(){
+					$("#customErrorNotificationPanel").animate({width:'toggle'});
+				});
 				
 				$(".backToHome").click(function(){
 					$(".panel").hide();
@@ -111,12 +115,19 @@ html
 					span.fa.fa-check#noticeIcon
 					#noticeText YOUR TRADE WAS SUBMITTED!
 					button(type="button")#closeNotification OK
+					
+				#customErrorNotificationPanel
+					span.fa.fa-minus-circle#errorNoticeIcon
+					h2#customErrorName Error
+					#customErrorNoticeText &nbsp;
+					button(type="button")#closeCustomNotification OK
 				
 				#errorNotificationPanel
 					span.fa.fa-minus-circle#errorNoticeIcon
 					h2#errorName Error
 					#errorNoticeText &nbsp;
 					p.hint This application cannot run without the blockchain network :(
+	
 				
 			#footerPanel
 				block footer

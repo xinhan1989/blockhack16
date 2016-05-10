@@ -41,7 +41,17 @@ module.exports.process_msg = function (ws, data) {
     else if (data.type == 'get_company') {
         chaincode.query.query(['GetCompany', data.company], data.user, cb_got_company);					//(args, enrollID, callback)
     }
-    //EY <-
+    //EY <--------------------
+    else if (data.type == 'createasset') {
+        if (data.asset && data.asset.name) {
+            console.log('!', data.asset);
+            chaincode.invoke.issuePropertyToken([JSON.stringify(data.asset)], data.user, cb_invoked);	//create a new asset (args, enrollID, callback)
+        }
+    }
+    else if (data.type == 'set_asset_forsale') {
+        console.log('set asset for sale', data.forsale);
+        chaincode.invoke.setForSale([JSON.stringify(data.forsale)], data.user);						//(args, enrollID, callback)
+    }
     else if (data.type == 'get_assets') {
         chaincode.query.query(['GetAllCPs', data.user], cb_got_assets);									//(args, enrollID, callback)
     }
@@ -66,11 +76,23 @@ module.exports.process_msg = function (ws, data) {
 				    + '"buyval":      	0,'
 				    + '"owner":       	[{'
 				    + '	           			"invid":  "' + data.user + '",'
-				    + '            			"quantity":    80'
+				    + '            			"quantity": 65'
+				    + '             	}, {'
+				    + '	           			"invid":    "user2",'
+				    + '            			"quantity": 5'
+				    + '             	}, {'
+				    + '	           			"invid":    "user3",'
+				    + '            			"quantity": 10'
 				    + '             	}],'
 				    + '"forsale":     	[{'
 				    + '	           			"invid":  "' + data.user + '",'
-                    + '             		"quantity":    20'
+                    + '             		"quantity":    5'
+				    + '             	}, {'
+				    + '	           			"invid":  "user2",'
+                    + '             		"quantity":    12'
+				    + '             	}, {'
+				    + '	           			"invid":  "user3",'
+                    + '             		"quantity":    3'
 				    + '             	}],'
 				    + '"issuer":      "' + data.user + '",'
                     + '"issueDate":   "' + dIssueDate
@@ -92,7 +114,7 @@ module.exports.process_msg = function (ws, data) {
     	}
 
     }
-    //EY ->
+    //EY -------------------------------------->
 
     function cb_got_papers(e, papers) {
         if (e != null) {

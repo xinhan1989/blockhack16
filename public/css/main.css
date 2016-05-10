@@ -391,13 +391,13 @@ label {
   border-bottom-left-radius: 10px;
   text-align: center; }
 
-#noticeText, #errorNoticeText {
+#noticeText, #errorNoticeText, #customErrorNoticeText {
   margin-bottom: 10px;
   font-size: 13px;
   width: 88%;
   text-align: center; }
 
-#closeNotification {
+#closeNotification, #closeCustomNotification {
   background: initial;
   color: #fff; }
 
@@ -407,7 +407,7 @@ label {
   top: 45px;
   color: #222832; }
 
-#errorNotificationPanel {
+#errorNotificationPanel, #customErrorNotificationPanel {
   display: none;
   width: 450px;
   position: absolute;
@@ -856,7 +856,7 @@ button:disabled, .inactiveButton {
     margin-left: 50px; }
   .colorInput {
     margin: 15px 0; }
-  #errorNotificationPanel {
+  #errorNotificationPanel, #customErrorNotificationPanel {
     top: 160px;
     width: 300px; } }
 

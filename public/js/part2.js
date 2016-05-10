@@ -28,7 +28,7 @@ var panels = [
     }
 ];
 
-    //EY <-
+//EY <-----------------
 var asset_panels = [
     {
         name: "wallet",
@@ -42,8 +42,22 @@ var asset_panels = [
         tableID: "#buysBody",
         filterPrefix: "buy_"
     }
-    //EY ->
 ];
+var asset_detail_panels = [
+    {
+        name: "walletAsset",
+        formID: "walletAssetFilter",
+        tableID: "#walletAssetBody",
+        filterPrefix: "walletAsset_"
+    },
+    {
+        name: "buyAsset",
+        formID: "buyFilter",
+        tableID: "#buyAssetBody",
+        filterPrefix: "buyAsset_"
+    }
+];
+//EY ------------------>
 
 // =================================================================================
 // On Load
@@ -61,15 +75,15 @@ $(document).on('ready', function () {
 
         // Display tabs based on user's role
         if (user.role && user.role.toUpperCase() === "auditor".toUpperCase()) {
-            $("#auditLink").show();
+            //$("#auditLink").show();
         } else if (user.username) {
-            $("#createLink").show();
-            $("#tradeLink").show();
+            //$("#createLink").show();
+            //$("#tradeLink").show();
             $("#createassetLink").show(); 	//EY
 			$("#walletLink").show();			//EY
-			$("#walletassetLink").show(); 	//EY the link will be moved to an asset entry in wallet panel
+			//$("#walletassetLink").show(); //EY the link will be moved to an asset entry in wallet panel
 			$("#buyLink").show();			//EY
-			$("#buyassetLink").show();		//EY the link will be moved to a asset entry in buy panel
+			//$("#buyassetLink").show();	//EY the link will be moved to a asset entry in buy panel
         }
     } else {
 
@@ -144,6 +158,46 @@ $(document).on('ready', function () {
         }
         return false;
     });
+    
+    //walletAssetSell
+    $(document).on("click", ".walletAssetSell", function () {
+    	
+        if (user.username) {
+        	
+        	//Get related data from button params
+        	var sCusip = $(this).attr('data_cusip');
+        	var sInvId = $(this).attr('data_invid');
+        	var nQuantity = $(this).attr('data_quantity');
+        	var sInputName = "input[name='" + $(this).attr('input_name') + "']";
+        	var nQtyForSale = Number($(sInputName).val());
+        	if (!nQtyForSale || nQtyForSale === 0 || nQtyForSale > nQuantity) {
+        		showErrorMessage("Quantity to sell must be beetween 1 and " + nQuantity + " inclusive");
+        		return;
+        	}
+        	if (user.name !== sInvId) {
+        		showErrorMessage("You can't sell property not belonging to you");
+        		return;
+        	}
+
+            var obj = {
+                type: "set_asset_forsale",
+                forsale: {
+					cusip:		 sCusip,
+					fromCompany: sInvId,
+				    quantity:    nQtyForSale
+                },
+                user: user.username
+            };
+            if (obj.forsale && obj.forsale.cusip) {
+                console.log('set asset for sale, sending', obj);
+                ws.send(JSON.stringify(obj));
+                $(".panel").hide();
+                $("#walletPanel").show();
+            }
+        }
+        return false;
+    });
+    
     //EY ->
     
     $("#createLink").click(function () {
@@ -213,7 +267,7 @@ $(document).on('ready', function () {
             build_trades(bag.papers, panels[i]);
         }
         //EY <-
-        for (var i in panels) {
+        for (var i in asset_panels) {
             build_assets(bag.assets, asset_panels[i]);
         }
         //EY ->
@@ -246,35 +300,47 @@ $(document).on('ready', function () {
         }
     });
     
-     //EY <- View Wallet Asset Details
-    $(document).on("click", ".walletAssetDetails", function () {
+     //EY <------------------------------------------------ 
+     //View Wallet Asset Details
+    $(document).on("click", ".detailWalletAsset", function () {
         if (user.username) {
-            console.log('wallet asset...');
-            var i = $(this).attr('trade_pos');
-            var cusip = $(this).attr('data_cusip');
-            var issuer = $(this).attr('data_issuer');
+            console.log('wallet asset details...');
+			showDetailPanel("walletasset");
+			//Build data
+			var sCusip = $(this).attr('data_cusip');
+			if (sCusip) {
+				for (var i in bag.assets) {
+				
+					if (bag.assets[i].cusip === sCusip) {
+						build_asset_details(bag.assets[i], asset_detail_panels[0]);	
+						return;
+					}
 
-            // TODO Map the trade_pos to the correct button
-            var msg = {
-                type: 'transfer_paper',
-                transfer: {
-                    //CUSIP: bag.papers[i].cusip,
-                    //fromCompany: bag.papers[i].issuer,
-                    CUSIP: cusip,
-                    fromCompany: issuer,
-                    toCompany: user.name,
-                    quantity: 1
-                },
-                user: user.username
-            };
-            console.log('sending', msg);
-            ws.send(JSON.stringify(msg));
-            //$("#notificationPanel").animate({width: 'toggle'});
+				}
+			}
         }
     });
-    //EY ->
-});
+    //View For Sale Asset Details
+    $(document).on("click", ".detailForSaleAsset", function () {
+        if (user.username) {
+            console.log('for sale asset details...');
+			showDetailPanel("buyasset");
+			//Build data
+			var sCusip = $(this).attr('data_cusip');
+			if (sCusip) {
+				for (var i in bag.assets) {
+				
+					if (bag.assets[i].cusip === sCusip) {
+						build_asset_details(bag.assets[i], asset_detail_panels[1]);	
+						return;
+					}
 
+				}
+			}
+        }
+    });
+    //EY -------------------------------------------->
+});
 
 // =================================================================================
 // Helper Fun
@@ -326,6 +392,7 @@ function connect_to_server() {
         ws.send(JSON.stringify({type: "get_papers", v: 2, user: user.username}));
         
         //EY <-
+        $("#customErrorNotificationPanel").fadeOut();
         ws.send(JSON.stringify({type: "get_assets", v: 2, user: user.username}));
         //EY ->
         
@@ -363,9 +430,9 @@ function connect_to_server() {
 			//EY <-
 			else if (data.msg === 'assets') {
 				try{
-					var assets = JSON.parse(data.assets);
+					bag.assets = JSON.parse(data.assets);
 					for (var i in asset_panels) {
-						build_assets(assets, asset_panels[i]);
+						build_assets(bag.assets, asset_panels[i]);
 					}
 				}
 				catch(e){
@@ -544,6 +611,8 @@ function build_trades(papers, panelDesc) {
     }
 }
 
+//EY <----------------------------------------------------------------------------
+
 /**
  * Process the list of assets from the server and displays them in the wallet list..
  * This function builds the tables for multiple panels, so an object is needed to
@@ -552,10 +621,6 @@ function build_trades(papers, panelDesc) {
  * @param panelDesc An object describing what panel the assets are being shown in.
  */
 function build_assets(assets, panelDesc) {
-
-    if(!user.name)
-    bag.wallet_assets = assets;						//store the assets for posterity
-    //console.log('papers:', bag.papers);
 
     if(assets && assets.length > 0) {
     	
@@ -569,11 +634,7 @@ function build_assets(assets, panelDesc) {
         var entries = [];
         for (var asset in assets) {
         	var broken_up = {};
-        	if (panelDesc.name === "wallet")
-              	broken_up = wallet_asset_to_entries(assets[asset], user);
-            else if (panelDesc.name === "buy") {
-				broken_up = buy_asset_to_entries(assets[asset]);            	
-            }
+            broken_up = asset_to_entries(assets[asset], user, panelDesc.name);
             entries = entries.concat(broken_up);
         }
         console.log("Displaying", assets.length, "assets as", entries.length, "entries");
@@ -584,65 +645,41 @@ function build_assets(assets, panelDesc) {
         // Display each entry as a row in the table
         var rows = [];
         for (var i in entries) {
-            console.log('!', entries[i]);
+        	
+            console.log('!', entries[i]);								
 
-            if (entries[i].qtyOwned > 0) {													//cannot buy when there are none
+            if (excluded(entries[i], filter)) {
 
-                if (excluded(entries[i], filter)) {
-                    var style;
-                    if (user.name.toLowerCase() === entries[i].owner.toLowerCase()) {
-                        //cannot buy my own stuff
-                        style = 'invalid';
-                    }
-                    else if (entries[i].issuer.toLowerCase() !== entries[i].owner.toLowerCase()) {
-                        //cannot buy stuff already bought
-                        style = 'invalid';
-                    } else {
-                        style = null;
-                    }
+                // Create a row for each valid asset
+                var data = [
+                    formatDate(Number(entries[i].issueDate), '%d/%M/%Y %I:%m%P'),
+                    entries[i].cusip,
+                    escapeHtml(entries[i].name.toUpperCase()),
+                    escapeHtml(entries[i].adrStreet),
+                    escapeHtml(entries[i].adrCity),
+                    escapeHtml(entries[i].adrPostcode),
+                    escapeHtml(entries[i].adrState),
+                    entries[i].qtyOwned,
+                    entries[i].qty4Sale,
+                    formatMoney(entries[i].mktval),
+                    entries[i].issuer];
 
-                    // Create a row for each valid asset
-                    if (panelDesc.name === "wallet") {
-	                    var data = [
-	                        formatDate(Number(entries[i].issueDate), '%M/%d %I:%m%P'),
-	                        entries[i].cusip,
-	                        escapeHtml(entries[i].name.toUpperCase()),
-	                        escapeHtml(entries[i].adrStreet),
-	                        escapeHtml(entries[i].adrCity),
-	                        escapeHtml(entries[i].adrPostcode),
-	                        escapeHtml(entries[i].adrState),
-	                        entries[i].qtyOwned,
-	                        entries[i].qty4Sale,
-	                        formatMoney(entries[i].mktval),
-	                        entries[i].issuer,
-	                        entries[i].owner];
-                	} else if (panelDesc.name === "buy") {
-                		
-            		}
+                var row = createRow(data);
+                var style = null;
+                style && row.classList.add(style);
 
-                    var row = createRow(data);
-                    style = null;
-                    style && row.classList.add(style);
-
-                    // Only the trade panel should allow you to interact with trades
-                    if (panelDesc.name === "wallet") {
-                        var disabled = false;
-                        var button = walletAssetButton(disabled, entries[i].cusip, entries[i].issuer);
-                        row.appendChild(button);
-                    }
-                    rows.push(row);
-                }
+                // Only the trade panel should allow you to interact with trades
+                var disabled = false;
+                var button = detailAssetButton(disabled, entries[i], panelDesc.name);
+                button && row.appendChild(button);
+                rows.push(row);
             }
-
         }
 
         // Placeholder for an empty table
         var html = '';
         if (rows.length == 0) {
-            if (panelDesc.name === 'wallet')
-                html = '<tr><td>nothing here...</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
-            else if (panelDesc.name === 'audit')
-                html = '<tr><td>nothing here...</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>'; // No action column
+            html = '<tr><td>nothing here...</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
             $(panelDesc.tableID).html(html);
         } else {
             // Remove the existing table data
@@ -660,13 +697,134 @@ function build_assets(assets, panelDesc) {
             }
         }
     } else {
-        if (panelDesc.name === 'wallet')
-            html = '<tr><td>nothing here...</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
-        else if (panelDesc.name === 'audit')
-            html = '<tr><td>nothing here...</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>'; // No action column
+        html = '<tr><td>nothing here...</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
         $(panelDesc.tableID).html(html);
     }
 }
+
+
+//EY <-------------
+function build_asset_details(oAsset, panelDesc) {
+	
+	$("input[name='name']").val(oAsset.name);
+	$("input[name='adrStreet']").val(oAsset.adrStreet);
+	$("input[name='adrCity']").val(oAsset.adrCity);
+	$("input[name='adrPostcode']").val(oAsset.adrPostcode);
+	$("input[name='adrState']").val(oAsset.adrState);
+	$("input[name='mktValue']").val(formatMoney(oAsset.mktval));
+	$("input[name='issuer']").val(oAsset.issuer);
+	$("input[name='issueDate']").val(formatDate(Number(oAsset.issueDate), '%d/%M/%Y %I:%m%P'));
+	
+	if(oAsset.owner && oAsset.owner.length > 0) {
+		
+		// If no panel is given, assume this is the wallet panel
+	    if (!panelDesc) {
+	     	panelDesc = asset_detail_panels[0];
+	    }  
+	    
+	    // Break the assets down into entries
+	    console.log('breaking asset owners into individual entries');
+	    var entries = [];
+    	var broken_up = {};
+    	if (panelDesc.name === "walletAsset")
+          	entries = asset_owners_to_entries(oAsset, user);
+        else if (panelDesc.name === "buyAsset") 
+			entries = asset_forsale_to_entries(oAsset, user);            	
+	        
+	    console.log("Displaying", entries.length, "entries");
+		
+		// Display each entry as a row in the table
+        var rows = [];
+        for (var i in entries) {
+        	
+            console.log('!', entries[i]);
+
+            if (entries[i].quantity > 0) {	//cannot buy when there are none for sale
+
+                var style = null;
+                var disabled = false;
+                var bRevoke = true;
+                
+                // Create a row for each valid asset
+                var data = [
+                    entries[i].invid,
+                    entries[i].quantity
+                ];
+
+                var row = createRow(data);
+                
+                //if user is investor 
+            	if (user.name.toLowerCase() !== entries[i].invid.toLowerCase()) {
+            		
+            		if (panelDesc.name === "walletAsset") {
+	                    //cannot sell not my own stuff
+	                    style = 'invalid';
+	                    disabled = true; 
+                	} else if (panelDesc.name === "buyAsset") {
+	                    //Can revoke my own stuff
+	                    bRevoke = false; 
+                	}
+
+            	}
+                var input  = detailAssetSellBuyInput(disabled, oAsset.cusip, entries[i].invid, entries[i].quantity, panelDesc.name);
+                var sInputName = input.firstElementChild.getAttribute('name');
+                var button = detailAssetSellBuyButton(disabled, oAsset.cusip, entries[i].invid, entries[i].quantity, sInputName, panelDesc.name, bRevoke);
+                
+                row.appendChild(input);
+                row.appendChild(button);
+
+                style && row.classList.add(style);
+                rows.push(row);
+            }
+        }
+
+        // Placeholder for an empty table
+        var html = '';
+        if (rows.length == 0) {
+            html = '<tr><td>nothing here...</td><td></td><td></td><td></td></tr>';
+        	$(panelDesc.tableID).html(html);
+        } else {
+            // Remove the existing table data
+            console.log("clearing existing table data");
+            var tableBody = $(panelDesc.tableID);
+            tableBody.empty();
+
+            // Add the new rows to the table
+            console.log("populating new table data");
+            var row;
+            while (rows.length > 0) {
+                row = rows.shift();
+                tableBody.append(row);
+            }
+        }
+        
+    } else {
+        html = '<tr><td>nothing here...</td><td></td><td></td><td></td></tr>';
+        $(panelDesc.tableID).html(html);
+    }
+}
+
+function showErrorMessage(sErrorMessage) {
+	$("#customErrorNoticeText").html(sErrorMessage);
+	$("#customErrorNotificationPanel").fadeIn();	
+}
+
+function showDetailPanel(show){
+	console.log('show detail', show);
+	if(show == '') show = 'wallet';							
+
+	$(".panel").hide();
+	if($("#" + show + "Panel").length == 0){
+		//$("#error404").fadeIn();
+	}
+	else{
+		$("#" + show + "Panel").fadeIn(300);
+		$(".selectedNav").removeClass("selectedNav");
+		$(this).addClass("selectedNav");
+	}
+}
+		
+//EY ------------------------------------------------------------------------------>
 
 
 // =================================================================================
