@@ -532,6 +532,7 @@ function connect_to_server() {
 				new_block(temp);									//send to blockchain.js
 			}
 			else if (data.msg === 'company') {
+				console.log("woo i'm here, lets set some account balances");
 				try{
 					var company = JSON.parse(data.company);
 					$("#accountBalance").html(formatMoney(company.cashBalance));
