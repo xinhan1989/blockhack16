@@ -253,7 +253,7 @@ $(document).on('ready', function () {
         		showErrorMessage("Quantity to revoke must be beetween 1 and " + nQuantity + " inclusive");
         		return;
         	}
-        	if (user.name !=== sInvId) {
+        	if (user.name !== sInvId) {
         		showErrorMessage("You can't revoke property owned by others");
         		return;
         	}
@@ -469,7 +469,7 @@ function connect_to_server() {
         clear_blocks();
         $("#errorNotificationPanel").fadeOut();
         ws.send(JSON.stringify({type: "chainstats", v: 2, user: user.username}));
-        ws.send(JSON.stringify({type: "get_papers", v: 2, user: user.username}));
+        //ws.send(JSON.stringify({type: "get_papers", v: 2, user: user.username}));
         
         //EY <-
         $("#customErrorNotificationPanel").fadeOut();
@@ -541,7 +541,8 @@ function connect_to_server() {
 			}
 			else if (data.msg === 'reset') {
 				// Ask for all available trades and information for the current company
-				ws.send(JSON.stringify({type: "get_papers", v: 2, user: user.username}));
+				//ws.send(JSON.stringify({type: "get_papers", v: 2, user: user.username}));
+				ws.send(JSON.stringify({type: "get_assets", v: 2, user: user.username})); //EY
 				if (user.role !== "auditor") {
 					ws.send(JSON.stringify({type: 'get_company', company: user.name, user: user.username}));
 				}
