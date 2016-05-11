@@ -137,11 +137,12 @@ $(document).on('ready', function () {
 				    adrState:    escapeHtml($("select[name='adrState']").val()),
 				    quantity:    Number($("input[name='qty']").val()),
 				    mktval:      Number($("input[name='mktValue']").val()),
-				    buyval:      0,
-				    owner:       [{
-				    	           investorID:  user.name,
-                                   quantity:    Number($("input[name='qty']").val())
-				                 }],
+				    buyval:      Number($("input[name='mktValue']").val()),
+				    owner:       [], //The owner is being added on chaincode side
+				    //owner:       [{
+				    //	           investorID:  user.name,
+                    //               quantity:    Number($("input[name='qty']").val())
+				    //             }],
 				    forsale:     [],
 				    issuer:      user.name,
                     issueDate:   Date.now().toString()
