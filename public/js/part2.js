@@ -774,13 +774,7 @@ function build_assets(assets, panelDesc) {
         // Add together total amount monetary value of assets
         var totalAssetValue = 0.00;
         for (var pty in entries) {
-        	var qtyOwned = 0;
-        	
-        	for(var i=0; i < pty.owner.length; i++ ) {
-      			if ( pty.owner[i].invid === user.name ) {
-      				qtyOwned = qtyOwned + pty.owner[i].quantity;
-      			}
-    		}
+        	var qtyOwned = pty.qtyOwned;
         	
         	var value = (pty.mktval/100) * qtyOwned;
         	totalAssetValue+=value;
