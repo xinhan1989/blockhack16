@@ -171,7 +171,7 @@ $(document).on('ready', function () {
         	var nQuantity = $(this).attr('data_quantity');
         	var sInputName = "input[name='" + $(this).attr('input_name') + "']";
         	var nQtyForSale = Number($(sInputName).val());
-        	if (!nQtyForSale || nQtyForSale === 0 || nQtyForSale > nQuantity) {
+        	if (!nQtyForSale || nQtyForSale <= 0 || nQtyForSale > nQuantity) {
         		showErrorMessage("Quantity to sell must be beetween 1 and " + nQuantity + " inclusive");
         		return;
         	}
@@ -210,7 +210,7 @@ $(document).on('ready', function () {
         	var nQuantity = $(this).attr('data_quantity');
         	var sInputName = "input[name='" + $(this).attr('input_name') + "']";
         	var nQtyToBuy = Number($(sInputName).val());
-        	if (!nQtyToBuy || nQtyToBuy === 0 || nQtyToBuy > nQuantity) {
+        	if (!nQtyToBuy || nQtyToBuy <= 0 || nQtyToBuy > nQuantity) {
         		showErrorMessage("Quantity to buy must be beetween 1 and " + nQuantity + " inclusive");
         		return;
         	}
@@ -250,7 +250,7 @@ $(document).on('ready', function () {
         	var nQuantity = $(this).attr('data_quantity');
         	var sInputName = "input[name='" + $(this).attr('input_name') + "']";
         	var nQtyToBuy = Number($(sInputName).val());
-        	if (!nQtyToBuy || nQtyToBuy === 0 || nQtyToBuy > nQuantity) {
+        	if (!nQtyToBuy || nQtyToBuy <= 0 || nQtyToBuy > nQuantity) {
         		showErrorMessage("Quantity to revoke must be beetween 1 and " + nQuantity + " inclusive");
         		return;
         	}
