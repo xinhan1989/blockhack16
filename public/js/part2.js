@@ -774,9 +774,10 @@ function build_assets(assets, panelDesc) {
         // Add together total amount monetary value of assets
         var totalAssetValue = 0.00;
         for (var pty in entries) {
+        	var curAsset = pty.asset;
         	var qtyOwned = pty.qtyOwned;
         	
-        	var value = (pty.mktval/pty.asset.quantity) * qtyOwned;
+        	var value = (pty.mktval/curAsset.quantity) * qtyOwned;
         	totalAssetValue+=value;
         }
 		$("#assetValue").html(formatMoney(totalAssetValue));
