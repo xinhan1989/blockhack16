@@ -536,7 +536,7 @@ function connect_to_server() {
 				try{
 					var company = JSON.parse(data.company);
 					console.log("Account balance is: ", company.cashBalance);
-					$("#accountBalance").html(formatMoney(company.cashBalance));
+					$("#accountBalance1").html(formatMoney(company.cashBalance));
 					console.log("Set account balance");
 				}
 				catch(e){
