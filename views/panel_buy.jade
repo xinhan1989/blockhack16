@@ -30,7 +30,7 @@
 	#openBuys
 		br
 		p
-			span(style="font-weight:bold;") Account Balance:
+			span(style="font-weight:bold;") Account Balance: 
 			span#accountBalance1 Loading from blockchain...
 		br
 		a.filter-button(href="#buyModal") Filter Assets
@@ -46,8 +46,10 @@
 					th: a.sort-selector(sort="adrCity") CITY
 					th: a.sort-selector(sort="adrPostcode") POSTCODE
 					th: a.sort-selector(sort="adrState") STATE
-					th: a.sort-selector(sort="qtyOwned") OWNED BY YOU
-					th: a.sort-selector(sort="qty4Sale") FOR SALE
+					th: a.sort-selector(sort="qtyOwned") QTY OWNED BY YOU
+					th: a.sort-selector(sort="valOwned") VALUE OWNED BY YOU
+					th: a.sort-selector(sort="qty4Sale") QTY FOR SALE
+					th: a.sort-selector(sort="val4Sale") VALUE FOR SALE
 					th: a.sort-selector(sort="mktval")  MARKET VALUE
 					th: a.sort-selector(sort="issuer")  ISSUER
 					th ACTION

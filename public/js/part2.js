@@ -1,3 +1,4 @@
+/*globals asset_owners_to_entries asset_to_entries*/
 /*eslint-env browser */
 /* global clear_blocks */
 /* global formatMoney */
@@ -129,30 +130,52 @@ $(document).on('ready', function () {
     	
         if (user.username) {
         	
-        	var sId = user.name + Date.now().toString() + randStr(10);
+        	var sId  		= user.name + Date.now().toString() + randStr(10);
+        	var nQty 		= Number($("input[name='qty']").val());
+        	var fMktValue	= Number($("input[name='mktValue']").val());
+        	var sName 		= escapeHtml($("input[name='name']").val()).trim();
+        	
+        	//Quantity/Value validations
+        	if (fMktValue <= 0) {
+        		showErrorMessage("Market Value must be greater than zero");
+        		return;
+        	}
+        	if (nQty <= 0) {
+        		showErrorMessage("Quantity must be greater than zero");
+        		return;
+        	}
+        	//Dont allow quantity to be greater than value to avoid small amount fractions
+        	if (nQty > fMktValue) {
+        		showErrorMessage("Quantity cannot be greater than Market Value");
+        		return;
+        	}
+        	//Property name is mandatory
+        	if (!sName || sName === "") {
+        		showErrorMessage("Name is a mandatory parameter");
+        		return;
+        	}
+        	
+        	//PRepare asset object
             var obj = {
                 type: "createasset",
                 asset: {
                 	cusip:		 sId.toUpperCase(),
-					name:		 escapeHtml($("input[name='name']").val()),
+					name:		 sName,
 				    adrStreet:   escapeHtml($("input[name='adrStreet']").val()),
 				    adrCity:     escapeHtml($("input[name='adrCity']").val()),
 				    adrPostcode: escapeHtml($("input[name='adrPostcode']").val()),
 				    adrState:    escapeHtml($("select[name='adrState']").val()),
-				    quantity:    Number($("input[name='qty']").val()),
-				    mktval:      Number($("input[name='mktValue']").val()),
-				    buyval:      Number($("input[name='mktValue']").val()),
+				    quantity:    nQty, 
+				    mktval:      fMktValue,
+				    buyval:      fMktValue,
 				    owner:       [], //The owner is being added on chaincode side
-				    //owner:       [{
-				    //	           investorID:  user.name,
-                    //               quantity:    Number($("input[name='qty']").val())
-				    //             }],
 				    forsale:     [],
 				    issuer:      user.name,
                     issueDate:   Date.now().toString()
                 },
                 user: user.username
             };
+            //Submit a new asset object to blockchain
             if (obj.asset && obj.asset.name) {
                 obj.asset.name = obj.asset.name.toUpperCase();
                 console.log('creating asset, sending', obj);
@@ -174,8 +197,8 @@ $(document).on('ready', function () {
         		showErrorMessage("Asset ID cannot be identified. Try to refresh");
         		return;
         	}
-        	var nMktValOld = $(this).attr('data_mktval');
-        	var nMktValNew = Number($("input[name='mktValue']").val());
+        	var nMktValOld = Number($(this).attr('data_mktval'));
+        	var nMktValNew = Number($("input[name='walletAsset-mktValueUpd']").val());
         	//Validations
         	if (nMktValOld === nMktValNew) {
         		showErrorMessage("The market value is not changed. Nothing to update");
@@ -556,7 +579,7 @@ function connect_to_server() {
 			//EY <-
 			else if (data.msg === 'assets') {
 				try{
-					bag.assets = JSON.parse(data.assets);
+					bag.assets = extendAssets(JSON.parse(data.assets));
 					for (var i in asset_panels) {
 						build_assets(bag.assets, asset_panels[i]);
 					}
@@ -746,6 +769,51 @@ function build_trades(papers, panelDesc) {
 //EY <----------------------------------------------------------------------------
 
 /**
+ * Extend Asset objects with additional data (like market value per owner)
+ */
+function extendAssets(aAssets) {
+	
+	var aAssetExt = aAssets;
+	var fValRemainder = 0.00;
+	var nQtyRemainder = 0;
+	//Process assets received from blockchain
+	for (var i=0; i < aAssetExt.length; i++) {
+		
+		//New attr: market value per token
+		aAssetExt[i].mktvalPerToken = aAssetExt[i].mktval / aAssetExt[i].quantity;
+		
+		//Remainders: used to avoid any discrepancy during rounding
+		fValRemainder = aAssetExt[i].mktval;
+		nQtyRemainder = aAssetExt[i].quantity;
+		
+		//Process subsets per owner
+		for (var j=0; j < aAssetExt[i].owner.length; j++) {
+			//New attr: total market value per owner
+			aAssetExt[i].owner[j].mktval = aAssetExt[i].mktvalPerToken * aAssetExt[i].owner[j].quantity;
+			//last division subset
+			if (nQtyRemainder === aAssetExt[i].owner[j].quantity) {
+				aAssetExt[i].owner[j].mktval = fValRemainder;
+			}
+			nQtyRemainder -= aAssetExt[i].owner[j].quantity;
+			fValRemainder -= aAssetExt[i].owner[j].mktval;			
+		}
+		
+		//Process subsets for sale
+		for (var k=0; k < aAssetExt[i].forsale.length; k++) {
+			//New attr: total market value per sale
+			aAssetExt[i].forsale[k].mktval = aAssetExt[i].mktvalPerToken * aAssetExt[i].forsale[k].quantity;
+			//last division subset
+			if (nQtyRemainder === aAssetExt[i].forsale[k].quantity) {
+				aAssetExt[i].forsale[k].mktval = fValRemainder;
+			}
+			nQtyRemainder -= aAssetExt[i].forsale[k].quantity;
+			fValRemainder -= aAssetExt[i].forsale[k].mktval;	
+		}
+	}
+	return aAssetExt;
+}
+
+/**
  * Process the list of assets from the server and displays them in the wallet list..
  * This function builds the tables for multiple panels, so an object is needed to
  * identify which table it should be drawing to.
@@ -765,31 +833,24 @@ function build_assets(assets, panelDesc) {
         console.log('breaking assets into individual entries');
         var entries = [];
         for (var asset in assets) {
-        	var broken_up = {};
+        	var broken_up = [];
             broken_up = asset_to_entries(assets[asset], user, panelDesc.name);
             entries = entries.concat(broken_up);
         }
         console.log("Displaying", assets.length, "assets as", entries.length, "entries");
-        
-        // Add together total amount monetary value of assets
-        var totalAssetValue = 0.00;
-        for (var pty in entries) {
-        	var curAsset = pty.asset;
-        	var qtyOwned = pty.qtyOwned;
-        	
-        	var value = (pty.mktval/curAsset.quantity) * qtyOwned;
-        	totalAssetValue+=value;
-        }
-		$("#assetValue").html(formatMoney(totalAssetValue));
-		
+      
         entries.sort(sort_selected);
         if (sort_reversed) entries.reverse();
 
         // Display each entry as a row in the table
         var rows = [];
+        var totalAssetValue = 0.00;
         for (var i in entries) {
         	
-            console.log('!', entries[i]);								
+            console.log('!', entries[i]);	
+            
+			// Add together total amount monetary value of assets
+            totalAssetValue += entries[i].valOwned;
 
             if (excluded(entries[i], filter)) {
 
@@ -803,7 +864,9 @@ function build_assets(assets, panelDesc) {
                     escapeHtml(entries[i].adrPostcode),
                     escapeHtml(entries[i].adrState),
                     entries[i].qtyOwned,
+                    formatMoney(entries[i].valOwned),
                     entries[i].qty4Sale,
+                    formatMoney(entries[i].val4Sale),
                     formatMoney(entries[i].mktval),
                     entries[i].issuer];
 
@@ -818,11 +881,13 @@ function build_assets(assets, panelDesc) {
                 rows.push(row);
             }
         }
+        //Display total owned value in the header line
+        if (panelDesc.name === "wallet") $("#assetValue").html(formatMoney(totalAssetValue));
 
         // Placeholder for an empty table
         var html = '';
         if (rows.length == 0) {
-            html = '<tr><td>nothing here...</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
+            html = '<tr><td>nothing here...</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
             $(panelDesc.tableID).html(html);
         } else {
             // Remove the existing table data
@@ -840,7 +905,7 @@ function build_assets(assets, panelDesc) {
             }
         }
     } else {
-        html = '<tr><td>nothing here...</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
+        html = '<tr><td>nothing here...</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
         $(panelDesc.tableID).html(html);
     }
 }
@@ -849,17 +914,18 @@ function build_assets(assets, panelDesc) {
 //EY <-------------
 function build_asset_details(oAsset, panelDesc) {
 	
-	$("input[name='name']").val(oAsset.name);
-	$("input[name='adrStreet']").val(oAsset.adrStreet);
-	$("input[name='adrCity']").val(oAsset.adrCity);
-	$("input[name='adrPostcode']").val(oAsset.adrPostcode);
-	$("input[name='adrState']").val(oAsset.adrState);
-	$("input[name='mktValue']").val(formatMoney(oAsset.mktval));
-	$("input[name='issuer']").val(oAsset.issuer);
-	$("input[name='issueDate']").val(formatDate(Number(oAsset.issueDate), '%d/%M/%Y %I:%m%P'));
+	$("input[name='" + panelDesc.name + "-name']").val(oAsset.name);
+	$("input[name='" + panelDesc.name + "-adrStreet']").val(oAsset.adrStreet);
+	$("input[name='" + panelDesc.name + "-adrCity']").val(oAsset.adrCity);
+	$("input[name='" + panelDesc.name + "-adrPostcode']").val(oAsset.adrPostcode);
+	$("input[name='" + panelDesc.name + "-adrState']").val(oAsset.adrState);
+	$("input[name='" + panelDesc.name + "-mktValue']").val(formatMoney(oAsset.mktval));
+	$("input[name='" + panelDesc.name + "-issuer']").val(oAsset.issuer);
+	$("input[name='" + panelDesc.name + "-issueDate']").val(formatDate(Number(oAsset.issueDate), '%d/%M/%Y %I:%m%P'));
 	
-	//Set attributes for "Update Market Value" button to be used on click event
+	//Set market value for update and attributes for "Update Market Value" button to be used on click event
 	if (panelDesc.name === "walletAsset") {
+		$("input[name='" + panelDesc.name + "-mktValueUpd']").val(oAsset.mktval);
 		var btnMktValue = document.getElementById("submitMktValue");
 		if (btnMktValue) {
 			btnMktValue.setAttribute('data_cusip', oAsset.cusip); 
@@ -878,7 +944,6 @@ function build_asset_details(oAsset, panelDesc) {
 	    // Break the assets down into entries
 	    console.log('breaking asset owners into individual entries');
 	    var entries = [];
-    	var broken_up = {};
     	if (panelDesc.name === "walletAsset")
           	entries = asset_owners_to_entries(oAsset, user);
         else if (panelDesc.name === "buyAsset") 
@@ -901,7 +966,8 @@ function build_asset_details(oAsset, panelDesc) {
                 // Create a row for each valid asset
                 var data = [
                     entries[i].invid,
-                    entries[i].quantity
+                    entries[i].quantity,
+                    formatMoney(entries[i].mktval)
                 ];
 
                 var row = createRow(data);
@@ -934,7 +1000,7 @@ function build_asset_details(oAsset, panelDesc) {
         // Placeholder for an empty table
         var html = '';
         if (rows.length == 0) {
-            html = '<tr><td>nothing here...</td><td></td><td></td><td></td></tr>';
+            html = '<tr><td>nothing here...</td><td></td><td></td><td></td><td></td></tr>';
         	$(panelDesc.tableID).html(html);
         } else {
             // Remove the existing table data
@@ -952,7 +1018,7 @@ function build_asset_details(oAsset, panelDesc) {
         }
         
     } else {
-        html = '<tr><td>nothing here...</td><td></td><td></td><td></td></tr>';
+        html = '<tr><td>nothing here...</td><td></td><td></td><td></td><td></td></tr>';
         $(panelDesc.tableID).html(html);
     }
 }

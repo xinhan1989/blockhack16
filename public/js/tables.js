@@ -167,8 +167,9 @@ function asset_owners_to_entries(asset, oUser) {
           // Create a row for each valid asset
 	    if ( asset.owner[i].quantity > 0) {
 	        var entry = {
-	            invid: asset.owner[i].invid,
-	            quantity: asset.owner[i].quantity
+	            invid: 			asset.owner[i].invid,
+	            quantity: 		asset.owner[i].quantity,
+	            mktval:			asset.owner[i].mktval
 	        };
 	
 	        entries.push(entry);
@@ -186,8 +187,9 @@ function asset_forsale_to_entries(asset, oUser) {
           // Create a row for each valid asset
 	    if ( asset.forsale[i].quantity > 0) {
 	        var entry = {
-	            invid: asset.forsale[i].invid,
-	            quantity: asset.forsale[i].quantity
+	            invid: 			asset.forsale[i].invid,
+	            quantity: 		asset.forsale[i].quantity,
+	            mktval:			asset.forsale[i].mktval
 	        };
 	
 	        entries.push(entry);
@@ -201,42 +203,50 @@ function asset_to_entries(asset, oUser, sPanelName) {
     var entries = [];
     var qtyOwned = 0;
     var qty4Sale = 0;
+    var valOwned = 0.0;
+    var val4Sale = 0.0;
     var bValid = false;
  	//Quantity owned by the user
     for(var i=0; i < asset.owner.length; i++ ) {
       if ( asset.owner[i].invid === oUser.name ) {
-      	qtyOwned = qtyOwned + asset.owner[i].quantity;
+      	qtyOwned += asset.owner[i].quantity;
+      	valOwned += asset.owner[i].mktval;
       }
     }
     //Quantity selected for sale by the user
     for(var i=0; i < asset.forsale.length; i++ ) {
         if (sPanelName === "wallet") {
-    		if ( asset.forsale[i].invid === oUser.name ) qty4Sale = qty4Sale + asset.forsale[i].quantity;
+    		if ( asset.forsale[i].invid === oUser.name ) {
+    			qty4Sale += asset.forsale[i].quantity;
+    			val4Sale += asset.forsale[i].mktval;
+			}	
     	} else if (sPanelName === "buy") {
-    		qty4Sale = qty4Sale + asset.forsale[i].quantity;
+    		qty4Sale += asset.forsale[i].quantity;
+    		val4Sale += asset.forsale[i].mktval;
 		}
     }
     bValid = (sPanelName === "wallet" && (qtyOwned > 0 || qty4Sale > 0)) || (sPanelName === "buy" && qty4Sale > 0);
     // Create a row for each valid asset
     if (bValid) {
         var entry = {
-            issueDate: asset.issueDate,
-            cusip: asset.cusip,
-            name: asset.name,
-            adrStreet: asset.adrStreet,
-            adrCity: asset.adrCity,
-            adrPostcode: asset.adrPostcode,
-            adrState: asset.adrState,
-            mktval: asset.mktval,
-            buyval: asset.buyval,
-            qtyOwned: qtyOwned,
-            qty4Sale: qty4Sale,
-            issuer: asset.issuer,
-            owner: oUser.name
+            issueDate: 		asset.issueDate,
+            cusip: 			asset.cusip,
+            name: 			asset.name,
+            adrStreet: 		asset.adrStreet,
+            adrCity: 		asset.adrCity,
+            adrPostcode: 	asset.adrPostcode,
+            adrState: 		asset.adrState,
+            mktval: 		asset.mktval,
+            buyval: 		asset.buyval,
+            quantity:		asset.quantity,
+            mktvalPerToken:	asset.mktvalPerToken,
+            qtyOwned: 		qtyOwned,
+            valOwned:		valOwned,
+            qty4Sale: 		qty4Sale,
+            val4Sale:		val4Sale,
+            issuer: 		asset.issuer
         };
 
-        // Save which asset this is associated with
-        entry.asset = asset;
         entries.push(entry);
     }
 

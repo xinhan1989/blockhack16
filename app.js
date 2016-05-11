@@ -315,7 +315,8 @@ function cb_deployed(e, d) {
                 console.log('hey new block, lets refresh and broadcast to all');
                 ibc.block_stats(chain_stats.height - 1, cb_blockstats);
                 wss.broadcast({msg: 'reset'});
-                chaincode.query.query(['GetAllCPs'], cb_got_papers);
+                //chaincode.query.query(['GetAllCPs'], cb_got_papers);
+                chaincode.query.query(['GetAllPTYs'], cb_got_assets);
             }
 
             //got the block's stats, lets send the statistics
@@ -333,6 +334,16 @@ function cb_deployed(e, d) {
                     wss.broadcast({msg: 'papers', papers: papers});
                 }
             }
+            
+            function cb_got_assets(e, assets) {
+                if (e != null) {
+                    console.log('assets error', e);
+                }
+                else {
+                    wss.broadcast({msg: 'assets', assets: assets});
+                }
+            }
+
 
             //call back for getting open trades, lets send the trades
             function cb_got_trades(e, trades) {

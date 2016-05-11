@@ -12,16 +12,22 @@ type Asset struct {
     PT4Sale     []ForSale  `json:"forsale"`
     Issuer      string     `json:"issuer"`
     IssueDate   string     `json:"issueDate"`
+    
+    mktvalPerToken //extended
 }
 
 type Owner struct {
     InvestorID  string   `json:"invid"`    //user name
     Quantity    int      `json:"quantity"`
+    
+    mktval	//per owner: extended
 }
 
 type ForSale struct {
     InvestorID  string   `json:"invid"`    //user name
     Quantity    int      `json:"quantity"`
+    
+    mktval	//for sale: extended
 }
 
 //User account

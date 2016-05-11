@@ -5,31 +5,32 @@
 	#innerWrap
 		span.fa.fa-home(style="font-size: 250px; float:left;")
 		
-		form(action="/buyasset" method="POST")#buyassetform
-			legend 
-				input(type="text" name="name" readonly="true")
-				span.hint NAME
-			legend 
-				input(type="text" name="adrStreet" readonly="true")
-				span.hint STREET ADDRESS
-			legend 
-				input(type="text" name="adrCity" readonly="true")
-				span.hint CITY
-			legend 
-				input(type="number" name="adrPostcode" readonly="true")
-				span.hint POSTCODE
-			legend 
-				input(type="text" name="adrState" readonly="true")
-				span.hint STATE
-			legend 
-				input(type="text" name="mktValue" readonly="true")
-				span.hint MARKET VALUE
-			legend 
-				input(type="text" name="issuer" readonly="true")
-				span.hint ISSUER
-			legend 
-				input(type="text" name="issueDate" readonly="true")
-				span.hint ISSUE	DATE
+		span(style="float: left;")
+			form(action="/buyasset" method="POST")#buyassetform
+				legend 
+					input(type="text" name="buyAsset-name" readonly="true")
+					span.hint NAME
+				legend 
+					input(type="text" name="buyAsset-adrStreet" readonly="true")
+					span.hint STREET ADDRESS
+				legend 
+					input(type="text" name="buyAsset-adrCity" readonly="true")
+					span.hint CITY
+				legend 
+					input(type="number" name="buyAsset-adrPostcode" readonly="true")
+					span.hint POSTCODE
+				legend 
+					input(type="text" name="buyAsset-adrState" readonly="true")
+					span.hint STATE
+				legend 
+					input(type="text" name="buyAsset-mktValue" readonly="true")
+					span.hint MARKET VALUE
+				legend 
+					input(type="text" name="buyAsset-issuer" readonly="true")
+					span.hint ISSUER
+				legend 
+					input(type="text" name="buyAsset-issueDate" readonly="true")
+					span.hint ISSUE	DATE
 				
 			br
 			br
@@ -37,8 +38,9 @@
 				thead
 					tr 
 						th INVESTOR
-						th FOR SALE
-						th TO BUY 
+						th QTY FOR SALE
+						th VALUE FOR SALE
+						th QTY TO BUY 
 						th ACTION
 				tbody#buyAssetBody
 				

@@ -4,46 +4,49 @@
 	
 	#innerWrap
 		span.fa.fa-home(style="font-size: 250px; float:left;")
-		
-		form(action="/walletasset" method="POST")#walletassetform
-			legend 
-				input(type="text" name="name" readonly="true")
-				span.hint NAME
-			legend 
-				input(type="text" name="adrStreet" readonly="true")
-				span.hint STREET ADDRESS
-			legend 
-				input(type="text" name="adrCity" readonly="true")
-				span.hint CITY
-			legend 
-				input(type="number" name="adrPostcode" readonly="true")
-				span.hint POSTCODE
-			legend 
-				input(type="text" name="adrState" readonly="true")
-				span.hint STATE
-			legend 
-				input(type="text" name="issuer" readonly="true")
-				span.hint ISSUER
-			legend 
-				input(type="text" name="issueDate" readonly="true")
-				span.hint ISSUE	DATE
-			legend 
-				input(type="text" name="mktValue" readonly="true")
-				span.hint MARKET VALUE	
-			legend
-				button(type="button" style="margin:5px;")#submitMktValue
-					span.fa.fa-check &nbsp;&nbsp;
-					span UPDATE MARKET VALUE	
-				
+	
+		span(style="float: left;")
+			form(action="/walletasset" method="POST")#walletassetform
+				legend 
+					input(type="text" name="walletAsset-name" readonly="true")
+					span.hint NAME
+				legend 
+					input(type="text" name="walletAsset-adrStreet" readonly="true")
+					span.hint STREET ADDRESS
+				legend 
+					input(type="text" name="walletAsset-adrCity" readonly="true")
+					span.hint CITY
+				legend 
+					input(type="number" name="walletAsset-adrPostcode" readonly="true")
+					span.hint POSTCODE
+				legend 
+					input(type="text" name="walletAsset-adrState" readonly="true")
+					span.hint STATE
+				legend 
+					input(type="text" name="walletAsset-issuer" readonly="true")
+					span.hint ISSUER
+				legend 
+					input(type="text" name="walletAsset-issueDate" readonly="true")
+					span.hint ISSUE	DATE
+				legend 
+					input(type="text" name="walletAsset-mktValue")
+					span.hint MARKET VALUE
+				legend 
+					input(type="text" name="walletAsset-mktValueUpd")
+					button(type="button" style="margin:5px;")#submitMktValue
+						span.fa.fa-hand-o-left &nbsp;&nbsp;
+						span UPDATE MARKET VALUE	
 			br
 			br
-			table#walletAssetTable
-				thead
-					tr 
-						th INVESTOR
-						th OWNED
-						th TO SELL 
-						th ACTION
-				tbody#walletAssetBody
+			
+		table#walletAssetTable
+			thead
+				tr 
+					th INVESTOR
+					th QTY OWNED 
+					th VALUE OWNED
+					th QTY TO SELL
+					th ACTION
+			tbody#walletAssetBody
 			
 				

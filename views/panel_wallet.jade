@@ -30,10 +30,10 @@
 	#openWallets
 		br
 		p
-			span(style="font-weight:bold;") Account Balance:
+			span(style="font-weight:bold;") Account Balance: 
 			span#accountBalance2 Loading from blockchain...
 		p
-			span(style="font-weight:bold;") Total Asset Value:
+			span(style="font-weight:bold;") Total Asset Value: 
 			span#assetValue Loading from blockchain...
 		br
 		a.filter-button(href="#walletModal") Filter Assets
@@ -49,8 +49,10 @@
 					th: a.sort-selector(sort="adrCity") CITY
 					th: a.sort-selector(sort="adrPostcode") POSTCODE
 					th: a.sort-selector(sort="adrState") STATE
-					th: a.sort-selector(sort="qtyOwned") OWNED BY YOU
-					th: a.sort-selector(sort="qty4Sale") FOR SALE BY YOU
+					th: a.sort-selector(sort="qtyOwned") QTY OWNED BY YOU
+					th: a.sort-selector(sort="valOwned") VALUE OWNED BY YOU
+					th: a.sort-selector(sort="qty4Sale") QTY FOR SALE BY YOU
+					th: a.sort-selector(sort="val4Sale") VALUE FOR SALE BY YOU
 					th: a.sort-selector(sort="mktval")  MARKET VALUE
 					th: a.sort-selector(sort="issuer")  ISSUER
 					th ACTION
