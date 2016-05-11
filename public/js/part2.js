@@ -776,7 +776,7 @@ function build_assets(assets, panelDesc) {
         for (var pty in entries) {
         	var qtyOwned = pty.qtyOwned;
         	
-        	var value = (pty.mktval/100) * qtyOwned;
+        	var value = (pty.mktval/pty.asset.quantity) * qtyOwned;
         	totalAssetValue+=value;
         }
 		$("#assetValue").html(formatMoney(totalAssetValue));
