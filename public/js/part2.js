@@ -1,3 +1,4 @@
+/*eslint-env browser */
 /* global clear_blocks */
 /* global formatMoney */
 /* global in_array */
@@ -123,13 +124,16 @@ $(document).on('ready', function () {
     });
     
     //EY <--------------------------------------------------------------------------
-    $("#submitasset").click(function () { 
+    //Create new property
+    $("#submitasset").click(function () {
+    	
         if (user.username) {
+        	
         	var sId = user.name + Date.now().toString() + randStr(10);
             var obj = {
                 type: "createasset",
                 asset: {
-					cusip:		 sId.toUpperCase(),
+                	cusip:		 sId.toUpperCase(),
 					name:		 escapeHtml($("input[name='name']").val()),
 				    adrStreet:   escapeHtml($("input[name='adrStreet']").val()),
 				    adrCity:     escapeHtml($("input[name='adrCity']").val()),
@@ -152,6 +156,47 @@ $(document).on('ready', function () {
             if (obj.asset && obj.asset.name) {
                 obj.asset.name = obj.asset.name.toUpperCase();
                 console.log('creating asset, sending', obj);
+                ws.send(JSON.stringify(obj));
+                $(".panel").hide();
+                $("#walletPanel").show();
+            }
+        }
+        return false;
+    });
+    
+    //Update Market Value
+    $("#submitMktValue").click(function () {
+    	
+        if (user.username) {
+        	
+        	var sCusip = $(this).attr('data_cusip');
+        	if (!sCusip) {
+        		showErrorMessage("Asset ID cannot be identified. Try to refresh");
+        		return;
+        	}
+        	var nMktValOld = $(this).attr('data_mktval');
+        	var nMktValNew = Number($("input[name='mktValue']").val());
+        	//Validations
+        	if (nMktValOld === nMktValNew) {
+        		showErrorMessage("The market value is not changed. Nothing to update");
+        		return;
+        	}
+        	if (nMktValNew <= 0) {
+        		showErrorMessage("The market value cannot be zero or negative");
+        		return;
+        	}
+			//Prepare the object
+            var obj = {
+                type: "update_mktval",
+                update: {
+					cusip:		 sCusip,
+				    mktval:      nMktValNew
+                },
+                user: user.username
+            };
+            //Send the object
+            if (obj.update.cusip && obj.update.mktval) {
+                console.log('update market value, sending', obj);
                 ws.send(JSON.stringify(obj));
                 $(".panel").hide();
                 $("#walletPanel").show();
@@ -800,6 +845,16 @@ function build_asset_details(oAsset, panelDesc) {
 	$("input[name='issuer']").val(oAsset.issuer);
 	$("input[name='issueDate']").val(formatDate(Number(oAsset.issueDate), '%d/%M/%Y %I:%m%P'));
 	
+	//Set attributes for "Update Market Value" button to be used on click event
+	if (panelDesc.name === "walletAsset") {
+		var btnMktValue = document.getElementById("submitMktValue");
+		if (btnMktValue) {
+			btnMktValue.setAttribute('data_cusip', oAsset.cusip); 
+			btnMktValue.setAttribute('data_mktval', oAsset.mktval);
+		}
+	}
+
+	//Build owners/forsale table	
 	if(oAsset.owner && oAsset.owner.length > 0) {
 		
 		// If no panel is given, assume this is the wallet panel

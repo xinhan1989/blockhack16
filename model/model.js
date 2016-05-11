@@ -44,3 +44,8 @@ type TransferPaper {
     "toCompany":"",
     "quantity": 1
 }
+
+type UpdateMktVal struct {
+	CUSIP       string   `json:"cusip"`
+	MktValue    float64  `json:"mktval"`
+}

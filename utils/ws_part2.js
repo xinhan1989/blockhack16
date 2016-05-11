@@ -34,7 +34,7 @@ module.exports.process_msg = function (ws, data) {
     else if (data.type == 'transfer_paper') {
         console.log('transfering msg', data.transfer);
         chaincode.invoke.transferPaper([JSON.stringify(data.transfer)], data.user);						//(args, enrollID, callback)
-    }
+    } 
     else if (data.type == 'chainstats') {
         ibc.chain_stats(cb_chainstats);
     }
@@ -51,6 +51,10 @@ module.exports.process_msg = function (ws, data) {
     else if (data.type == 'transfer_asset') {
         console.log('transfering msg', data.transfer);
         chaincode.invoke.transferPaper([JSON.stringify(data.transfer)], data.user);						//(args, enrollID, callback)
+    }
+    else if (data.type == 'update_mktval') {
+        console.log('updating market value msg', data.update);
+        chaincode.invoke.updateMktVal([JSON.stringify(data.update)], data.user);						//(args, enrollID, callback)
     }
     else if (data.type == 'set_asset_forsale') {
         console.log('set asset for sale', data.forsale);

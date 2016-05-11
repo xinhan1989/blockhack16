@@ -1,6 +1,7 @@
 /**
  * Created by davery on 3/29/2016.
  */
+/*eslint-env browser */
 "use strict";
 
 function createRow(data) {
