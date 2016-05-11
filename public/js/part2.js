@@ -122,7 +122,7 @@ $(document).on('ready', function () {
         return false;
     });
     
-    //EY <-
+    //EY <--------------------------------------------------------------------------
     $("#submitasset").click(function () { 
         if (user.username) {
         	var sId = user.name + Date.now().toString() + randStr(10);
@@ -198,7 +198,87 @@ $(document).on('ready', function () {
         return false;
     });
     
-    //EY ->
+    //forsaleAssetBuy
+    $(document).on("click", ".forsaleAssetBuy", function () {
+    	
+        if (user.username) {
+        	
+        	//Get related data from button params
+        	var sCusip = $(this).attr('data_cusip');
+        	var sInvId = $(this).attr('data_invid');
+        	var nQuantity = $(this).attr('data_quantity');
+        	var sInputName = "input[name='" + $(this).attr('input_name') + "']";
+        	var nQtyToBuy = Number($(sInputName).val());
+        	if (!nQtyToBuy || nQtyToBuy === 0 || nQtyToBuy > nQuantity) {
+        		showErrorMessage("Quantity to buy must be beetween 1 and " + nQuantity + " inclusive");
+        		return;
+        	}
+        	if (user.name === sInvId) {
+        		showErrorMessage("You can't buy property owned by you");
+        		return;
+        	}
+
+            var obj = {
+                type: "transfer_asset",
+                transfer: {
+					cusip:		 sCusip,
+					fromCompany: sInvId,
+					toCompany:	 user.name,
+				    quantity:    nQtyToBuy
+                },
+                user: user.username
+            };
+            if (obj.transfer && obj.transfer.cusip) {
+                console.log('transfer asset, sending', obj);
+                ws.send(JSON.stringify(obj));
+                $(".panel").hide();
+                $("#walletPanel").show();
+            }
+        }
+        return false;
+    });
+    
+    //forsaleAssetRevoke
+    $(document).on("click", ".forsaleAssetRevoke", function () {
+    	
+        if (user.username) {
+        	
+        	//Get related data from button params
+        	var sCusip = $(this).attr('data_cusip');
+        	var sInvId = $(this).attr('data_invid');
+        	var nQuantity = $(this).attr('data_quantity');
+        	var sInputName = "input[name='" + $(this).attr('input_name') + "']";
+        	var nQtyToBuy = Number($(sInputName).val());
+        	if (!nQtyToBuy || nQtyToBuy === 0 || nQtyToBuy > nQuantity) {
+        		showErrorMessage("Quantity to revoke must be beetween 1 and " + nQuantity + " inclusive");
+        		return;
+        	}
+        	if (user.name !=== sInvId) {
+        		showErrorMessage("You can't revoke property owned by others");
+        		return;
+        	}
+
+            var obj = {
+                type: "transfer_asset",
+                transfer: {
+					cusip:		 sCusip,
+					fromCompany: sInvId,
+					toCompany:	 user.name,
+				    quantity:    nQtyToBuy
+                },
+                user: user.username
+            };
+            if (obj.transfer && obj.transfer.cusip) {
+                console.log('transfer asset, sending', obj);
+                ws.send(JSON.stringify(obj));
+                $(".panel").hide();
+                $("#walletPanel").show();
+            }
+        }
+        return false;
+    });    
+    
+    //EY -------------------------------------------------------------------------->
     
     $("#createLink").click(function () {
         $("input[name='name']").val('r' + randStr(6));

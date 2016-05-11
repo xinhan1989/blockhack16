@@ -37,3 +37,10 @@ type SetForSale {
 	FromCompany string   `json:"fromCompany"`
 	Quantity    int      `json:"quantity"`
 }
+
+type TransferPaper {
+    "CUSIP": "",
+    "fromCompany":"",
+    "toCompany":"",
+    "quantity": 1
+}

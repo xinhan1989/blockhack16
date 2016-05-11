@@ -37,7 +37,7 @@ router.route("/").get(function (req, res) {
 
 router.route("/home").get(function (req, res) {
     check_login(res, req);
-    res.redirect("/trade");
+    res.redirect("/wallet");
 });
 router.route("/create").get(function (req, res) {
     check_login(res, req);
@@ -170,7 +170,7 @@ function login(req, res) {
             if (req.session.role.toLowerCase() === 'auditor'.toLowerCase()) {
                 res.redirect('/audit');
             } else {
-                res.redirect('/trade');
+                res.redirect('/wallet');
             }
         }
     });

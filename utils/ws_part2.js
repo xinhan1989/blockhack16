@@ -41,25 +41,29 @@ module.exports.process_msg = function (ws, data) {
     else if (data.type == 'get_company') {
         chaincode.query.query(['GetCompany', data.company], data.user, cb_got_company);					//(args, enrollID, callback)
     }
-    //EY <--------------------
+    //EY <-------------------------------------------------------------------------
     else if (data.type == 'createasset') {
         if (data.asset && data.asset.name) {
             console.log('!', data.asset);
             chaincode.invoke.issuePropertyToken([JSON.stringify(data.asset)], data.user, cb_invoked);	//create a new asset (args, enrollID, callback)
         }
     }
+    else if (data.type == 'transfer_asset') {
+        console.log('transfering msg', data.transfer);
+        chaincode.invoke.transferPaper([JSON.stringify(data.transfer)], data.user);						//(args, enrollID, callback)
+    }
     else if (data.type == 'set_asset_forsale') {
         console.log('set asset for sale', data.forsale);
         chaincode.invoke.setForSale([JSON.stringify(data.forsale)], data.user);						//(args, enrollID, callback)
     }
     else if (data.type == 'get_assets') {
-        chaincode.query.query(['GetAllCPs', data.user], cb_got_assets);									//(args, enrollID, callback)
+        chaincode.query.query(['GetAllPTYs', data.user], cb_got_assets);									//(args, enrollID, callback)
     }
     
     //Callback func returning all wallet assets
     function cb_got_assets(e, assets) {
     	
-    	var bMock = true;
+    	var bMock = false;
     	//MOCK <-
     	if (bMock) {
     		
@@ -114,7 +118,7 @@ module.exports.process_msg = function (ws, data) {
     	}
 
     }
-    //EY -------------------------------------->
+    //EY -------------------------------------------------------------------------------------->
 
     function cb_got_papers(e, papers) {
         if (e != null) {

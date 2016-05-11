@@ -214,9 +214,16 @@ function configure_network() {
             users: users
         },
         chaincode: {
-            zip_url: 'https://github.com/IBM-Blockchain/cp-chaincode-v2/archive/master.zip',
-            unzip_dir: 'cp-chaincode-v2-master/hyperledger',							    //subdirectroy name of chaincode after unzipped
-            git_url: 'https://github.com/IBM-Blockchain/cp-chaincode-v2/hyperledger',		//GO get http url
+            
+            //EY <-----------------------------------------------------------------
+            zip_url: 'https://github.com/xinhan1989/chaincode/archive/master.zip',
+			unzip_dir: 'chaincode-master/hyper',
+			git_url: 'https://github.com/xinhan1989/chaincode/hyper'
+            //EY ----------------------------------------------------------------->
+            
+            //zip_url: 'https://github.com/IBM-Blockchain/cp-chaincode-v2/archive/master.zip',
+            //unzip_dir: 'cp-chaincode-v2-master/hyperledger',							    //subdirectroy name of chaincode after unzipped
+            //git_url: 'https://github.com/IBM-Blockchain/cp-chaincode-v2/hyperledger',		//GO get http url
 
             //hashed cc name from prev deployment
             //deployed_name: '2450c95bc77e124c766ff650c2f4642e5c0bc2d576ee67db130900750cddc5982e295f320fd5dff7aca2f61fa7cc673fcdcc8a7464f94c68eeccdb14b2384a75'
