@@ -736,7 +736,7 @@ function build_assets(assets, panelDesc) {
                 // Create a row for each valid asset
                 var data = [
                     formatDate(Number(entries[i].issueDate), '%d/%M/%Y %I:%m%P'),
-                    entries[i].cusip,
+                    //entries[i].cusip,
                     escapeHtml(entries[i].name.toUpperCase()),
                     escapeHtml(entries[i].adrStreet),
                     escapeHtml(entries[i].adrCity),
@@ -762,7 +762,7 @@ function build_assets(assets, panelDesc) {
         // Placeholder for an empty table
         var html = '';
         if (rows.length == 0) {
-            html = '<tr><td>nothing here...</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
+            html = '<tr><td>nothing here...</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
             $(panelDesc.tableID).html(html);
         } else {
             // Remove the existing table data
@@ -780,7 +780,7 @@ function build_assets(assets, panelDesc) {
             }
         }
     } else {
-        html = '<tr><td>nothing here...</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
+        html = '<tr><td>nothing here...</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
         $(panelDesc.tableID).html(html);
     }
 }
