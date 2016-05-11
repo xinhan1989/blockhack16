@@ -635,7 +635,7 @@ function build_trades(papers, panelDesc) {
                     } else {
                         style = null;
                     }
-
+                    
                     // Create a row for each valid trade
                     var data = [
                         formatDate(Number(entries[i].issueDate), '%M/%d %I:%m%P'),
@@ -725,7 +725,15 @@ function build_assets(assets, panelDesc) {
             entries = entries.concat(broken_up);
         }
         console.log("Displaying", assets.length, "assets as", entries.length, "entries");
-
+        
+        // Add together total amount monetary value of assets
+        var totalAssetValue = 0.00;
+        for (var things in entries) {
+        	var value = (things.mktval/100) * things.quantity;
+        	totalAssetValue+=value;
+        }
+		$("#assetValue").html(formatMoney(totalAssetValue));
+		
         entries.sort(sort_selected);
         if (sort_reversed) entries.reverse();
 
