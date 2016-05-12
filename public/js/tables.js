@@ -141,14 +141,35 @@ function detailAssetSellBuyButton(disabled, cusip, invid, quantity, sInputName, 
     return td;
 }
 
-function detailAssetSellBuyInput(disabled, cusip, invid, quantity, sPanelName) {
+function detailAssetSellBuyQtyInput(disabled, cusip, invid, quantity, mktval, sPanelName, sValInputName) {
 	
     var input = document.createElement('input');
-    var sName = "detailAssetSellBuyInput" + sPanelName + cusip + invid;
+    var sName = "detailAssetSellBuyQtyInput" + sPanelName + cusip + invid;
     input.setAttribute('type', 'number');
     input.setAttribute('name', sName);
     input.setAttribute('min', 1);
     input.setAttribute('max', quantity);
+    input.setAttribute('val_input_name', sValInputName);
+    input.setAttribute('data_quantity', quantity);
+    input.setAttribute('data_mktval', mktval);
+    input.disabled = disabled;
+    
+    input.classList.add('detailAssetSellBuyQtyInput');   
+
+    // Wrap the control in a td like the other items in the row.
+    var td = document.createElement('td');
+    td.appendChild(input);
+
+    return td;
+}
+
+function detailAssetSellBuyValInput(disabled, cusip, invid, sPanelName) {
+	
+    var input = document.createElement('input');
+    var sName = "detailAssetSellBuyValInput" + sPanelName + cusip + invid;
+    input.setAttribute('type', 'text');
+    input.setAttribute('name', sName);
+    input.setAttribute('readonly', 'true');
     input.disabled = disabled;
 
     // Wrap the control in a td like the other items in the row.

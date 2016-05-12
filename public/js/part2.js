@@ -1,4 +1,4 @@
-/*globals asset_owners_to_entries asset_to_entries*/
+/*globals asset_owners_to_entries asset_to_entries sort_reversed detailAssetSellBuyValInput detailAssetSellBuyQtyInput detailAssetSellBuyButton createRow*/
 /*eslint-env browser */
 /* global clear_blocks */
 /* global formatMoney */
@@ -83,9 +83,7 @@ $(document).on('ready', function () {
             //$("#tradeLink").show();
             $("#createassetLink").show(); 	//EY
 			$("#walletLink").show();			//EY
-			//$("#walletassetLink").show(); //EY the link will be moved to an asset entry in wallet panel
 			$("#buyLink").show();			//EY
-			//$("#buyassetLink").show();	//EY the link will be moved to a asset entry in buy panel
         }
     } else {
 
@@ -240,7 +238,12 @@ $(document).on('ready', function () {
         	var sInputName = "input[name='" + $(this).attr('input_name') + "']";
         	var nQtyForSale = Number($(sInputName).val());
         	if (!nQtyForSale || nQtyForSale <= 0 || nQtyForSale > nQuantity) {
-        		showErrorMessage("Quantity to sell must be beetween 1 and " + nQuantity + " inclusive");
+        		showErrorMessage("Quantity to sell must be integer number beetween 1 and " + nQuantity + " inclusive");
+        		return;
+        	}
+        	var nRemainder = nQtyForSale % 1;
+        	if (nRemainder !== 0) {
+        		showErrorMessage("Quantity to sell must be integer number. Fractional quantity is not supported");
         		return;
         	}
         	if (user.name !== sInvId) {
@@ -264,7 +267,7 @@ $(document).on('ready', function () {
                 $("#walletPanel").show();
             }
         }
-        return false;
+        //return false;
     });
     
     //forsaleAssetBuy
@@ -279,7 +282,12 @@ $(document).on('ready', function () {
         	var sInputName = "input[name='" + $(this).attr('input_name') + "']";
         	var nQtyToBuy = Number($(sInputName).val());
         	if (!nQtyToBuy || nQtyToBuy <= 0 || nQtyToBuy > nQuantity) {
-        		showErrorMessage("Quantity to buy must be beetween 1 and " + nQuantity + " inclusive");
+        		showErrorMessage("Quantity to buy must be integer number beetween 1 and " + nQuantity + " inclusive");
+        		return;
+        	}
+        	var nRemainder = nQtyToBuy % 1;
+        	if (nRemainder !== 0) {
+        		showErrorMessage("Quantity to buy must be integer number. Fractional quantity is not supported");
         		return;
         	}
         	if (user.name === sInvId) {
@@ -304,10 +312,39 @@ $(document).on('ready', function () {
                 $("#walletPanel").show();
             }
         }
-        return false;
+       // return false;
     });
     
-    //forsaleAssetRevoke
+    //Process change event of Qty Sell/Buy input controller
+    $(document).on("keyup", ".detailAssetSellBuyQtyInput", function () {
+    	
+        if (user.username) {
+        	
+        	//Get related data from input params
+        	var valInputName =  "input[name='" + $(this).attr('val_input_name') + "']";
+        	var qtyTotal = $(this).attr('data_quantity');
+        	var valTotal = Number($(this).attr('data_mktval'));
+        	
+        	//Get entered quantity
+			var qtyEntered = Number($(this).val()); 
+        	if (!qtyEntered || isNaN(qtyEntered) || qtyEntered < 0) {
+        		qtyEntered = 0;
+        	}
+        	
+        	//Get value input control
+        	var oValInput = $(valInputName);
+        	//Set calculated value
+        	var nCalcVal = 0.00;
+        	if (oValInput) {
+        		nCalcVal = ( valTotal / qtyTotal ) * qtyEntered;
+        		oValInput.val(formatMoney(nCalcVal));
+        	}
+        }
+        //return false;
+    });    
+    
+    //
+     //forsaleAssetRevoke
     $(document).on("click", ".forsaleAssetRevoke", function () {
     	
         if (user.username) {
@@ -319,7 +356,12 @@ $(document).on('ready', function () {
         	var sInputName = "input[name='" + $(this).attr('input_name') + "']";
         	var nQtyToBuy = Number($(sInputName).val());
         	if (!nQtyToBuy || nQtyToBuy <= 0 || nQtyToBuy > nQuantity) {
-        		showErrorMessage("Quantity to revoke must be beetween 1 and " + nQuantity + " inclusive");
+        		showErrorMessage("Quantity to revoke must be integer number beetween 1 and " + nQuantity + " inclusive");
+        		return;
+        	}
+        	var nRemainder = nQtyToBuy % 1;
+        	if (nRemainder !== 0) {
+        		showErrorMessage("Quantity to revoke must be integer number. Fractional quantity is not supported");
         		return;
         	}
         	if (user.name !== sInvId) {
@@ -344,8 +386,8 @@ $(document).on('ready', function () {
                 $("#walletPanel").show();
             }
         }
-        return false;
-    });    
+        //return false;
+    });  
     
     //EY -------------------------------------------------------------------------->
     
@@ -822,6 +864,7 @@ function extendAssets(aAssets) {
  */
 function build_assets(assets, panelDesc) {
 
+    var totalAssetValue = 0.00;
     if(assets && assets.length > 0) {
     	
         // If no panel is given, assume this is the wallet panel
@@ -844,13 +887,12 @@ function build_assets(assets, panelDesc) {
 
         // Display each entry as a row in the table
         var rows = [];
-        var totalAssetValue = 0.00;
         for (var i in entries) {
         	
             console.log('!', entries[i]);	
             
 			// Add together total amount monetary value of assets (includes ForSale value as well, as it still belongs to the owner)
-            totalAssetValue = totalAssetValue + entries[i].valOwned + entries[i].val4Sale;
+            totalAssetValue = totalAssetValue + entries[i].valOwned + entries[i].val4Sale; 
 
             if (excluded(entries[i], filter)) {
 
@@ -880,8 +922,6 @@ function build_assets(assets, panelDesc) {
                 rows.push(row);
             }
         }
-        //Display total owned value in the header line
-        if (panelDesc.name === "wallet") $("#assetValue").html(formatMoney(totalAssetValue));
 
         // Placeholder for an empty table
         var html = '';
@@ -907,6 +947,8 @@ function build_assets(assets, panelDesc) {
         html = '<tr><td>nothing here...</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
         $(panelDesc.tableID).html(html);
     }
+	//Display total owned value in the header line
+	if (panelDesc.name === "wallet") $("#assetValue").html(formatMoney(totalAssetValue));
 }
 
 
@@ -984,11 +1026,14 @@ function build_asset_details(oAsset, panelDesc) {
                 	}
 
             	}
-                var input  = detailAssetSellBuyInput(disabled, oAsset.cusip, entries[i].invid, entries[i].quantity, panelDesc.name);
-                var sInputName = input.firstElementChild.getAttribute('name');
-                var button = detailAssetSellBuyButton(disabled, oAsset.cusip, entries[i].invid, entries[i].quantity, sInputName, panelDesc.name, bRevoke);
-                
-                row.appendChild(input);
+            	var valInput  = detailAssetSellBuyValInput(disabled, oAsset.cusip, entries[i].invid, panelDesc.name);
+            	var valInputName = valInput.firstElementChild.getAttribute('name');
+                var qtyInput  = detailAssetSellBuyQtyInput(disabled, oAsset.cusip, entries[i].invid, entries[i].quantity, entries[i].mktval, panelDesc.name, valInputName);
+                var qtyInputName = qtyInput.firstElementChild.getAttribute('name');
+                var button = detailAssetSellBuyButton(disabled, oAsset.cusip, entries[i].invid, entries[i].quantity, qtyInputName, panelDesc.name, bRevoke);
+  
+                row.appendChild(qtyInput);
+                row.appendChild(valInput);
                 row.appendChild(button);
 
                 style && row.classList.add(style);
@@ -999,7 +1044,7 @@ function build_asset_details(oAsset, panelDesc) {
         // Placeholder for an empty table
         var html = '';
         if (rows.length == 0) {
-            html = '<tr><td>nothing here...</td><td></td><td></td><td></td><td></td></tr>';
+            html = '<tr><td>nothing here...</td><td></td><td></td><td></td><td></td><td></td></tr>';
         	$(panelDesc.tableID).html(html);
         } else {
             // Remove the existing table data
@@ -1017,7 +1062,7 @@ function build_asset_details(oAsset, panelDesc) {
         }
         
     } else {
-        html = '<tr><td>nothing here...</td><td></td><td></td><td></td><td></td></tr>';
+        html = '<tr><td>nothing here...</td><td></td><td></td><td></td><td></td><td></td></tr>';
         $(panelDesc.tableID).html(html);
     }
 }
