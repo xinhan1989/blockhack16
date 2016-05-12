@@ -816,6 +816,9 @@ function build_trades(papers, panelDesc) {
 function extendAssets(aAssets) {
 	
 	var aAssetExt = aAssets;
+	if (!aAssets) {
+		aAssetExt = [];
+	}
 	var fValRemainder = 0.00;
 	var nQtyRemainder = 0;
 	//Process assets received from blockchain
