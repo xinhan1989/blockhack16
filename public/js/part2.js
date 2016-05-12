@@ -850,7 +850,7 @@ function build_assets(assets, panelDesc) {
             console.log('!', entries[i]);	
             
 			// Add together total amount monetary value of assets (includes ForSale value as well, as it still belongs to the owner)
-            totalAssetValue = totalAssetValue + entries[i].valOwned + entries[i].valForSale;
+            totalAssetValue = totalAssetValue + entries[i].valOwned + entries[i].val4Sale;
 
             if (excluded(entries[i], filter)) {
 
