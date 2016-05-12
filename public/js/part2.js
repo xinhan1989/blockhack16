@@ -849,15 +849,14 @@ function build_assets(assets, panelDesc) {
         	
             console.log('!', entries[i]);	
             
-			// Add together total amount monetary value of assets
-            totalAssetValue += entries[i].valOwned;
+			// Add together total amount monetary value of assets (includes ForSale value as well, as it still belongs to the owner)
+            totalAssetValue = totalAssetValue + entries[i].valOwned + entries[i].valForSale;
 
             if (excluded(entries[i], filter)) {
 
                 // Create a row for each valid asset
                 var data = [
                     formatDate(Number(entries[i].issueDate), '%d/%M/%Y %I:%m%P'),
-                    //entries[i].cusip,
                     escapeHtml(entries[i].name.toUpperCase()),
                     escapeHtml(entries[i].adrStreet),
                     escapeHtml(entries[i].adrCity),

@@ -117,14 +117,14 @@ function detailAssetSellBuyButton(disabled, cusip, invid, quantity, sInputName, 
     	
 		button.classList.add('walletAssetSell');    	
 		span.innerHTML = ' &nbsp;&nbsp;SELL';
-		span.classList.add('fa-dollar');
+		span.classList.add('fa-sign-out');
 		
     } else if (sPanelName === "buyAsset") {
     	
     	if (!bRevoke) {
 			button.classList.add('forsaleAssetBuy');    	
 			span.innerHTML = ' &nbsp;&nbsp;BUY';
-			span.classList.add('fa-dollar');
+			span.classList.add('fa-sign-in');
 		} else {
 			button.classList.add('forsaleAssetRevoke');    	
 			span.innerHTML = ' &nbsp;&nbsp;REVOKE';
