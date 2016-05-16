@@ -59,7 +59,7 @@ body {
   width: 100%;
   text-align: left;
   height: 100%;
-  color: #555;
+  color: #000;
   background: #343D48; }
 
 h1 {
@@ -115,7 +115,7 @@ table {
 
 tr {
   margin-bottom: 5px;
-  background: #39424D;
+  background: #000;
   border-bottom: 6px #343D48 solid; }
 
 tr:hover {
@@ -189,7 +189,7 @@ img {
   max-width: 100%; }
 
 a, a:visited {
-  color: #2e6da4;
+  color: #c00;
   cursor: pointer; }
 
 a:hover {
@@ -263,7 +263,7 @@ label {
   z-index: 2; }
 
 #logo {
-  color: #7E90A0;
+  color: #c00;
   display: inline-block;
   margin-left: 20px;
   font-size: 18px;
