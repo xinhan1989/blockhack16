@@ -167,10 +167,16 @@ function detailAssetSellBuyValInput(disabled, cusip, invid, sPanelName) {
 	
     var input = document.createElement('input');
     var sName = "detailAssetSellBuyValInput" + sPanelName + cusip + invid;
-    input.setAttribute('type', 'text');
     input.setAttribute('name', sName);
-    input.setAttribute('readonly', 'true');
     input.disabled = disabled;
+    
+    //Make it editable for wallet asset, to let owner set his sale price
+    if (sPanelName !== "walletAsset") {
+    	input.setAttribute('readonly', 'true');
+    	input.setAttribute('type', 'text');
+	} else {
+		input.setAttribute('type', 'number');
+	}
 
     // Wrap the control in a td like the other items in the row.
     var td = document.createElement('td');
@@ -210,7 +216,7 @@ function asset_forsale_to_entries(asset, oUser) {
 	        var entry = {
 	            invid: 			asset.forsale[i].invid,
 	            quantity: 		asset.forsale[i].quantity,
-	            mktval:			asset.forsale[i].mktval
+	            mktval:			asset.forsale[i].quantity * asset.forsale[i].sellval //asset.forsale[i].mktval
 	        };
 	
 	        entries.push(entry);
@@ -239,11 +245,11 @@ function asset_to_entries(asset, oUser, sPanelName) {
         if (sPanelName === "wallet") {
     		if ( asset.forsale[i].invid === oUser.name ) {
     			qty4Sale += asset.forsale[i].quantity;
-    			val4Sale += asset.forsale[i].mktval;
+    			val4Sale += asset.forsale[i].quantity * asset.forsale[i].sellval;
 			}	
     	} else if (sPanelName === "buy") {
     		qty4Sale += asset.forsale[i].quantity;
-    		val4Sale += asset.forsale[i].mktval;
+    		val4Sale += asset.forsale[i].quantity * asset.forsale[i].sellval;
 		}
     }
     bValid = (sPanelName === "wallet" && (qtyOwned > 0 || qty4Sale > 0)) || (sPanelName === "buy" && qty4Sale > 0);

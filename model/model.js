@@ -38,20 +38,28 @@ type Account struct {
     AssetsIds   []string `json:"assetIds"`
 }
 
-type SetForSale {
-	CUSIP       string   `json:"cusip"`
-	FromCompany string   `json:"fromCompany"`
-	Quantity    int      `json:"quantity"`
-}
-
-type TransferPaper {
-    "CUSIP": "",
-    "fromCompany":"",
-    "toCompany":"",
-    "quantity": 1
-}
 
 type UpdateMktVal struct {
 	CUSIP       string   `json:"cusip"`
 	MktValue    float64  `json:"mktval"`
+}
+
+type ForSale struct {
+    InvestorID string   `json:"invid"`
+    Quantity   int      `json:"quantity"`
+    SellVal    float64  `json:"sellval"`  //value per token
+}
+
+type Transaction struct {
+	CUSIP       string   `json:"cusip"`
+	FromCompany string   `json:"fromCompany"`
+	ToCompany   string   `json:"toCompany"`
+	Quantity    int      `json:"quantity"`
+}
+
+type AddForSale struct {
+    CUSIP       string   `json:"cusip"`
+    FromCompany string   `json:"fromCompany"`
+    Quantity    int      `json:"quantity"`
+    SellVal     float64  `json:"sellval"`
 }

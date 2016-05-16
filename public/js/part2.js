@@ -1,4 +1,4 @@
-/*globals asset_owners_to_entries asset_to_entries sort_reversed detailAssetSellBuyValInput detailAssetSellBuyQtyInput detailAssetSellBuyButton createRow*/
+/*globals asset_owners_to_entries asset_to_entries sort_reversed detailAssetSellBuyValInput detailAssetSellBuyQtyInput detailAssetSellBuyButton createRow asset_forsale_to_entries*/
 /*eslint-env browser */
 /* global clear_blocks */
 /* global formatMoney */
@@ -235,10 +235,16 @@ $(document).on('ready', function () {
         	var sCusip = $(this).attr('data_cusip');
         	var sInvId = $(this).attr('data_invid');
         	var nQuantity = $(this).attr('data_quantity');
-        	var sInputName = "input[name='" + $(this).attr('input_name') + "']";
-        	var nQtyForSale = Number($(sInputName).val());
+        	var sQtyInputName = "input[name='" + $(this).attr('input_name') + "']";
+        	var sValInputName = "input[name='" + $(sQtyInputName).attr("val_input_name") + "']";
+        	var nQtyForSale = Number($(sQtyInputName).val());
+        	var nValForSale = Number($(sValInputName).val());
         	if (!nQtyForSale || nQtyForSale <= 0 || nQtyForSale > nQuantity) {
         		showErrorMessage("Quantity to sell must be integer number beetween 1 and " + nQuantity + " inclusive");
+        		return;
+        	}
+        	if (!nValForSale || nValForSale <= 0) {
+        		showErrorMessage("Value to sell must be greater than 0");
         		return;
         	}
         	var nRemainder = nQtyForSale % 1;
@@ -251,12 +257,14 @@ $(document).on('ready', function () {
         		return;
         	}
 
+			var nValForSalePerToken = nValForSale / nQtyForSale; //TODO: avoid value lost during rounding
             var obj = {
                 type: "set_asset_forsale",
                 forsale: {
 					cusip:		 sCusip,
 					fromCompany: sInvId,
-				    quantity:    nQtyForSale
+				    quantity:    nQtyForSale,
+				    sellval:	 nValForSalePerToken
                 },
                 user: user.username
             };
@@ -316,7 +324,7 @@ $(document).on('ready', function () {
     });
     
     //Process change event of Qty Sell/Buy input controller
-    $(document).on("keyup", ".detailAssetSellBuyQtyInput", function () {
+    $(document).on("keyup change", ".detailAssetSellBuyQtyInput", function () {
     	
         if (user.username) {
         	
@@ -336,8 +344,12 @@ $(document).on('ready', function () {
         	//Set calculated value
         	var nCalcVal = 0.00;
         	if (oValInput) {
-        		nCalcVal = ( valTotal / qtyTotal ) * qtyEntered;
-        		oValInput.val(formatMoney(nCalcVal));
+        		var inpType = oValInput.attr("type");
+        		nCalcVal = valTotal / qtyTotal * qtyEntered;
+        		if (inpType === "text") 
+        			oValInput.val(formatMoney(nCalcVal));
+    			else
+    				oValInput.val(nCalcVal);
         	}
         }
         //return false;
@@ -444,7 +456,7 @@ $(document).on('ready', function () {
         else sort_reversed = false;
 
         // Add the appropriate arrow to the current selector
-        var arrow_icon = (sort_reversed ? 'fa-arrow-up' : 'fa-arrow-down');
+        var arrow_icon = sort_reversed ? 'fa-arrow-up' : 'fa-arrow-down';
         var span = document.createElement('span');
         span.classList.add('fa');
         span.classList.add(arrow_icon);
@@ -1009,9 +1021,9 @@ function build_asset_details(oAsset, panelDesc) {
                 
                 // Create a row for each valid asset
                 var data = [
-                    entries[i].invid,
-                    entries[i].quantity,
-                    formatMoney(entries[i].mktval)
+                    entries[i].invid,				//owner id
+                    entries[i].quantity,				//qty
+                    formatMoney(entries[i].mktval)	//val to sell/buy
                 ];
 
                 var row = createRow(data);
