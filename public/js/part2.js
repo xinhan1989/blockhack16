@@ -1,4 +1,4 @@
-/*globals asset_owners_to_entries asset_to_entries sort_reversed detailAssetSellBuyValInput detailAssetSellBuyQtyInput detailAssetSellBuyButton createRow asset_forsale_to_entries*/
+/*globals asset_owners_to_entries asset_to_entries sort_reversed detailAssetSellBuyValInput detailAssetSellBuyQtyInput detailAssetSellBuyButton createRow asset_forsale_to_entries detailAssetButton*/
 /*eslint-env browser */
 /* global clear_blocks */
 /* global formatMoney */
@@ -31,6 +31,12 @@ var panels = [
 ];
 
 //EY <-----------------
+var mAssetStatus = {
+	PENDING:	"Pending",
+	APPROVED: 	"Approved",
+	LOCKED:		"Locked"
+};
+
 var asset_panels = [
     {
         name: "wallet",
@@ -43,6 +49,12 @@ var asset_panels = [
         formID: "buyFilter",
         tableID: "#buysBody",
         filterPrefix: "buy_"
+    },
+    {
+        name: "approve",
+        formID: "approveFilter",
+        tableID: "#approvesBody",
+        filterPrefix: "approve_"
     }
 ];
 var asset_detail_panels = [
@@ -57,6 +69,12 @@ var asset_detail_panels = [
         formID: "buyFilter",
         tableID: "#buyAssetBody",
         filterPrefix: "buyAsset_"
+    },
+    {
+        name: "approveAsset",
+        formID: "approveAssetFilter",
+        tableID: "#approveAssetBody",
+        filterPrefix: "approveAsset_"
     }
 ];
 //EY ------------------>
@@ -76,11 +94,10 @@ $(document).on('ready', function () {
     if (user.username) {
 
         // Display tabs based on user's role
-        if (user.role && user.role.toUpperCase() === "auditor".toUpperCase()) {
-            //$("#auditLink").show();
+        if (user.role && user.role.toUpperCase() === "approver".toUpperCase()) {
+            $("#approveLink").show(); //EY
+            
         } else if (user.username) {
-            //$("#createLink").show();
-            //$("#tradeLink").show();
             $("#createassetLink").show(); 	//EY
 			$("#walletLink").show();			//EY
 			$("#buyLink").show();			//EY
@@ -196,13 +213,13 @@ $(document).on('ready', function () {
         		return;
         	}
         	var nMktValOld = Number($(this).attr('data_mktval'));
-        	var nMktValNew = Number($("input[name='walletAsset-mktValueUpd']").val());
+        	var nMktValNew = Number($("input[name='approveAsset-mktValueUpd']").val());
         	//Validations
-        	if (nMktValOld === nMktValNew) {
-        		showErrorMessage("The market value is not changed. Nothing to update");
-        		return;
+        	if (nMktValOld === nMktValNew) { //updating status as well
+        		//showErrorMessage("The market value is not changed. Nothing to update");
+        		//return;
         	}
-        	if (nMktValNew <= 0) {
+        	if (nMktValNew <= 0 || isNaN(nMktValNew)) {
         		showErrorMessage("The market value cannot be zero or negative");
         		return;
         	}
@@ -210,8 +227,9 @@ $(document).on('ready', function () {
             var obj = {
                 type: "update_mktval",
                 update: {
-					cusip:		 sCusip,
-				    mktval:      nMktValNew
+					cusip:	sCusip,
+				    mktval:	nMktValNew,
+				    status:	mAssetStatus.APPROVED
                 },
                 user: user.username
             };
@@ -220,7 +238,7 @@ $(document).on('ready', function () {
                 console.log('update market value, sending', obj);
                 ws.send(JSON.stringify(obj));
                 $(".panel").hide();
-                $("#walletPanel").show();
+                $("#approvePanel").show();
             }
         }
         return false;
@@ -234,11 +252,19 @@ $(document).on('ready', function () {
         	//Get related data from button params
         	var sCusip = $(this).attr('data_cusip');
         	var sInvId = $(this).attr('data_invid');
+        	var sStatus = $(this).attr('data_status');
+        	
+        	if (sStatus !== mAssetStatus.APPROVED) {
+        		showErrorMessage("Asset has not been approved yet. You cannot sell it");
+        		return;
+        	}
+        	
         	var nQuantity = $(this).attr('data_quantity');
         	var sQtyInputName = "input[name='" + $(this).attr('input_name') + "']";
         	var sValInputName = "input[name='" + $(sQtyInputName).attr("val_input_name") + "']";
         	var nQtyForSale = Number($(sQtyInputName).val());
         	var nValForSale = Number($(sValInputName).val());
+        	
         	if (!nQtyForSale || nQtyForSale <= 0 || nQtyForSale > nQuantity) {
         		showErrorMessage("Quantity to sell must be integer number beetween 1 and " + nQuantity + " inclusive");
         		return;
@@ -287,6 +313,13 @@ $(document).on('ready', function () {
         	var sCusip = $(this).attr('data_cusip');
         	var sInvId = $(this).attr('data_invid');
         	var nQuantity = $(this).attr('data_quantity');
+        	var sStatus = $(this).attr('data_status');
+        	
+        	if (sStatus !== mAssetStatus.APPROVED) {
+        		showErrorMessage("Asset has not been approved yet. You cannot buy it");
+        		return;
+        	}
+        	
         	var sInputName = "input[name='" + $(this).attr('input_name') + "']";
         	var nQtyToBuy = Number($(sInputName).val());
         	if (!nQtyToBuy || nQtyToBuy <= 0 || nQtyToBuy > nQuantity) {
@@ -438,6 +471,16 @@ $(document).on('ready', function () {
         console.log("Change in wallet filter detected.");
         processFilterForm(asset_panels[0]);
     });
+    $(".buy-filter").keyup(function () {
+        "use strict";
+        console.log("Change in buy filter detected.");
+        processFilterForm(asset_panels[0]);
+    });
+    $(".approve-filter").keyup(function () {
+        "use strict";
+        console.log("Change in approve filter detected.");
+        processFilterForm(asset_panels[0]);
+    });
     //EY ->
 
     // Click events for the columns of the table
@@ -523,6 +566,25 @@ $(document).on('ready', function () {
 			}
         }
     });
+    //View Asset Details for Approval
+    $(document).on("click", ".detailApproveAsset", function () {
+        if (user.username) {
+            console.log('approve asset details...');
+			showDetailPanel("approveasset");
+			//Build data
+			var sCusip = $(this).attr('data_cusip');
+			if (sCusip) {
+				for (var i in bag.assets) {
+				
+					if (bag.assets[i].cusip === sCusip) {
+						build_asset_details(bag.assets[i], asset_detail_panels[2]);	
+						return;
+					}
+
+				}
+			}
+        }
+    });
     //View For Sale Asset Details
     $(document).on("click", ".detailForSaleAsset", function () {
         if (user.username) {
@@ -599,7 +661,7 @@ function connect_to_server() {
         ws.send(JSON.stringify({type: "get_assets", v: 2, user: user.username}));
         //EY ->
         
-        if (user.name && user.role !== "auditor") {
+        if (user.name && user.role !== "approver") {
             ws.send(JSON.stringify({type: 'get_company', company: user.name, user: user.username}));
         }
     }
@@ -671,7 +733,7 @@ function connect_to_server() {
 				// Ask for all available trades and information for the current company
 				//ws.send(JSON.stringify({type: "get_papers", v: 2, user: user.username}));
 				ws.send(JSON.stringify({type: "get_assets", v: 2, user: user.username})); //EY
-				if (user.role !== "auditor") {
+				if (user.role !== "approver") {
 					ws.send(JSON.stringify({type: 'get_company', company: user.name, user: user.username}));
 				}
 			}
@@ -912,19 +974,35 @@ function build_assets(assets, panelDesc) {
             if (excluded(entries[i], filter)) {
 
                 // Create a row for each valid asset
-                var data = [
-                    formatDate(Number(entries[i].issueDate), '%d/%M/%Y %I:%m%P'),
-                    escapeHtml(entries[i].name.toUpperCase()),
-                    escapeHtml(entries[i].adrStreet),
-                    escapeHtml(entries[i].adrCity),
-                    escapeHtml(entries[i].adrPostcode),
-                    escapeHtml(entries[i].adrState),
-                    entries[i].qtyOwned,
-                    formatMoney(entries[i].valOwned),
-                    entries[i].qty4Sale,
-                    formatMoney(entries[i].val4Sale),
-                    formatMoney(entries[i].mktval),
-                    entries[i].issuer];
+                var data = [];
+                if (panelDesc.name === "approve") {
+                	data = [
+                    	formatDate(Number(entries[i].issueDate), '%d/%M/%Y %I:%m%P'),
+	                    escapeHtml(entries[i].name.toUpperCase()),
+	                    escapeHtml(entries[i].adrStreet),
+	                    escapeHtml(entries[i].adrCity),
+	                    escapeHtml(entries[i].adrPostcode),
+	                    escapeHtml(entries[i].adrState),
+	                    entries[i].quantity,
+	                    formatMoney(entries[i].mktval),
+	                    entries[i].issuer
+	            	];
+                } else {
+                	data = [
+                    	formatDate(Number(entries[i].issueDate), '%d/%M/%Y %I:%m%P'),
+	                    escapeHtml(entries[i].name.toUpperCase()),
+	                    escapeHtml(entries[i].adrStreet),
+	                    escapeHtml(entries[i].adrCity),
+	                    escapeHtml(entries[i].adrPostcode),
+	                    escapeHtml(entries[i].adrState),
+	                    entries[i].qtyOwned,
+	                    formatMoney(entries[i].valOwned),
+	                    entries[i].qty4Sale,
+	                    formatMoney(entries[i].val4Sale),
+	                    formatMoney(entries[i].mktval),
+	                    entries[i].issuer
+	            	];	
+                }
 
                 var row = createRow(data);
                 var style = null;
@@ -941,7 +1019,11 @@ function build_assets(assets, panelDesc) {
         // Placeholder for an empty table
         var html = '';
         if (rows.length == 0) {
-            html = '<tr><td>nothing here...</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
+        	if (panelDesc.name === "approve") {
+            	html = '<tr><td>nothing here...</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
+        	} else {
+        		html = '<tr><td>nothing here...</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
+        	}
             $(panelDesc.tableID).html(html);
         } else {
             // Remove the existing table data
@@ -959,7 +1041,11 @@ function build_assets(assets, panelDesc) {
             }
         }
     } else {
-        html = '<tr><td>nothing here...</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
+    	if (panelDesc.name === "approve") {
+            html = '<tr><td>nothing here...</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
+        } else {
+        	html = '<tr><td>nothing here...</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
+    	}
         $(panelDesc.tableID).html(html);
     }
 	//Display total owned value in the header line
@@ -975,12 +1061,19 @@ function build_asset_details(oAsset, panelDesc) {
 	$("input[name='" + panelDesc.name + "-adrCity']").val(oAsset.adrCity);
 	$("input[name='" + panelDesc.name + "-adrPostcode']").val(oAsset.adrPostcode);
 	$("input[name='" + panelDesc.name + "-adrState']").val(oAsset.adrState);
-	$("input[name='" + panelDesc.name + "-mktValue']").val(formatMoney(oAsset.mktval));
 	$("input[name='" + panelDesc.name + "-issuer']").val(oAsset.issuer);
 	$("input[name='" + panelDesc.name + "-issueDate']").val(formatDate(Number(oAsset.issueDate), '%d/%M/%Y %I:%m%P'));
 	
+	var sStatus = mAssetStatus.PENDING;
+	if (oAsset.status) sStatus = oAsset.status;
+	$("input[name='" + panelDesc.name + "-status']").val(sStatus);
+	
 	//Set market value for update and attributes for "Update Market Value" button to be used on click event
-	if (panelDesc.name === "walletAsset") {
+	if (panelDesc.name === "walletAsset" || panelDesc.name === "buyAsset") {
+		$("input[name='" + panelDesc.name + "-mktValue']").val(formatMoney(oAsset.mktval));
+		
+	} else if (panelDesc.name === "approveAsset") {
+
 		$("input[name='" + panelDesc.name + "-mktValueUpd']").val(oAsset.mktval);
 		var btnMktValue = document.getElementById("submitMktValue");
 		if (btnMktValue) {
@@ -1000,7 +1093,7 @@ function build_asset_details(oAsset, panelDesc) {
 	    // Break the assets down into entries
 	    console.log('breaking asset owners into individual entries');
 	    var entries = [];
-    	if (panelDesc.name === "walletAsset")
+    	if (panelDesc.name === "walletAsset" || panelDesc.name === "approveAsset")
           	entries = asset_owners_to_entries(oAsset, user);
         else if (panelDesc.name === "buyAsset") 
 			entries = asset_forsale_to_entries(oAsset, user);            	
@@ -1031,7 +1124,7 @@ function build_asset_details(oAsset, panelDesc) {
                 //if user is investor 
             	if (user.name.toLowerCase() !== entries[i].invid.toLowerCase()) {
             		
-            		if (panelDesc.name === "walletAsset") {
+            		if (panelDesc.name === "walletAsset" || panelDesc.name === "approveAsset") {
 	                    //cannot sell not my own stuff
 	                    style = 'invalid';
 	                    disabled = true; 
@@ -1045,7 +1138,7 @@ function build_asset_details(oAsset, panelDesc) {
             	var valInputName = valInput.firstElementChild.getAttribute('name');
                 var qtyInput  = detailAssetSellBuyQtyInput(disabled, oAsset.cusip, entries[i].invid, entries[i].quantity, entries[i].mktval, panelDesc.name, valInputName);
                 var qtyInputName = qtyInput.firstElementChild.getAttribute('name');
-                var button = detailAssetSellBuyButton(disabled, oAsset.cusip, entries[i].invid, entries[i].quantity, qtyInputName, panelDesc.name, bRevoke);
+                var button = detailAssetSellBuyButton(disabled, oAsset.cusip, oAsset.status, entries[i].invid, entries[i].quantity, qtyInputName, panelDesc.name, bRevoke);
   
                 row.appendChild(qtyInput);
                 row.appendChild(valInput);

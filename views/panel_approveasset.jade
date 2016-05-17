@@ -1,0 +1,55 @@
+#approveassetPanel(hidden).panel
+	h1 Asset for Approval
+	hr
+	
+	#innerWrap
+		span.fa.fa-gavel(style="font-size: 250px; float:left;")
+	
+		span(style="float: left;")
+			form(action="/approveasset" method="POST")#approveassetform
+				legend 
+					input(type="text" name="approveAsset-name" readonly="true")
+					span.hint NAME
+				legend 
+					input(type="text" name="approveAsset-adrStreet" readonly="true")
+					span.hint STREET ADDRESS
+				legend 
+					input(type="text" name="approveAsset-adrCity" readonly="true")
+					span.hint CITY
+				legend 
+					input(type="number" name="approveAsset-adrPostcode" readonly="true")
+					span.hint POSTCODE
+				legend 
+					input(type="text" name="approveAsset-adrState" readonly="true")
+					span.hint STATE
+				legend 
+					input(type="text" name="approveAsset-issuer" readonly="true")
+					span.hint ISSUER
+				legend 
+					input(type="text" name="approveAsset-issueDate" readonly="true")
+					span.hint ISSUE	DATE
+				legend 
+					input(type="text" name="approveAsset-status" readonly="true")
+					span.hint STATUS					
+				legend 
+					input(type="number" name="approveAsset-mktValueUpd")#inputMktValue
+					span.hint MARKET VALUE
+				legend
+					button(type="button" style="margin:5px;")#submitMktValue
+						span.fa.fa-thumbs-o-up &nbsp;&nbsp;
+						span UPDATE MARKET VALUE & APPROVE
+			br
+			br
+			
+		table#approveAssetTable
+			thead
+				tr 
+					th INVESTOR
+					th MY QTY
+					th MY MARKET VALUE
+					th QTY TO SELL
+					th VALUE TO SELL
+					th ACTION
+			tbody#approveAssetBody
+			
+				

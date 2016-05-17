@@ -1,5 +1,5 @@
 #walletassetPanel(hidden).panel
-	h1 My Property
+	h1 My Asset
 	hr
 	
 	#innerWrap
@@ -29,13 +29,11 @@
 					input(type="text" name="walletAsset-issueDate" readonly="true")
 					span.hint ISSUE	DATE
 				legend 
-					input(type="text" name="walletAsset-mktValue")
+					input(type="text" name="walletAsset-mktValue" readonly="true")
 					span.hint MARKET VALUE
 				legend 
-					input(type="text" name="walletAsset-mktValueUpd")
-					button(type="button" style="margin:5px;")#submitMktValue
-						span.fa.fa-hand-o-left &nbsp;&nbsp;
-						span UPDATE MARKET VALUE	
+					input(type="text" name="walletAsset-status" readonly="true")
+					span.hint STATUS
 			br
 			br
 			

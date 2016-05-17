@@ -1,42 +1,38 @@
-#buyPanel(hidden).panel
-	h1 Assets for Sale
+#approvePanel(hidden).panel
+	h1 Assets for Approval
 	hr
 	
 	br
-	#buyModal.modalDialog
+	#approveModal.modalDialog
 			div
 				.modal-header
 					h2 Filter assets
 					hr
 				.modal-content
-					form#buyFilter
+					form#approveFilter
 						label(for="asset_name") NAME
-						input#asset_name.buy-filter(type="text" name="name")
+						input#asset_name.approve-filter(type="text" name="name")
 						br
 						label(for="asset_street") STREET
-						input#asset_street.buy-filter(type="text" name="adrStreet")
+						input#asset_street.approve-filter(type="text" name="adrStreet")
 						br
 						label(for="asset_city") CITY
-						input#asset_city.buy-filter(type="text" name="adrCity")
+						input#asset_city.approve-filter(type="text" name="adrCity")
 						br
 						label(for="asset_postcode") PCODE
-						input#asset_postcode.buy-filter(type="text" name="adrPostcode")
+						input#asset_postcode.approve-filter(type="text" name="adrPostcode")
 						br
 						label(for="asset_state") STATE
-						input#asset_state.buy-filter(type="text" name="adrState")
+						input#asset_state.approve-filter(type="text" name="adrState")
 						br
 						a.filter-button(href="#close" title="Close") Close
 						
-	#openBuys
+	#openapproves
 		br
-		p
-			span(style="font-weight:bold;") Account Balance: 
-			span#accountBalance1 Loading from blockchain...
-		br
-		a.filter-button(href="#buyModal") Filter Assets
+		a.filter-button(href="#approveModal") Filter Assets
 		br
 		br
-		table#buysTable.tablesorter
+		table#approvesTable.tablesorter
 			thead
 				tr 
 					TH: a.sort-selector(sort="date") DATE
@@ -46,11 +42,8 @@
 					th: a.sort-selector(sort="adrCity") CITY
 					th: a.sort-selector(sort="adrPostcode") POSTCODE
 					th: a.sort-selector(sort="adrState") STATE
-					th: a.sort-selector(sort="qtyOwned") MY QTY
-					th: a.sort-selector(sort="valOwned") MY VALUE
-					th: a.sort-selector(sort="qty4Sale") QTY FOR SALE
-					th: a.sort-selector(sort="val4Sale") VALUE FOR SALE
+					th: a.sort-selector(sort="qtyOwned") QTY
 					th: a.sort-selector(sort="mktval")  MARKET VALUE
 					th: a.sort-selector(sort="issuer")  ISSUER
 					th ACTION
-			tbody#buysBody
+			tbody#approvesBody

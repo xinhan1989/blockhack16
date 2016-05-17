@@ -12,6 +12,7 @@ type Asset struct {
     PT4Sale     []ForSale  `json:"forsale"`
     Issuer      string     `json:"issuer"`
     IssueDate   string     `json:"issueDate"`
+    Status      string     `json:"status"`    //Approved||Pending
     
     mktvalPerToken //extended
 }

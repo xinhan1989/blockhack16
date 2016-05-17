@@ -1,5 +1,5 @@
 #buyassetPanel(hidden).panel
-	h1 Property for Sale
+	h1 Asset for Sale
 	hr
 	
 	#innerWrap
@@ -23,14 +23,17 @@
 					input(type="text" name="buyAsset-adrState" readonly="true")
 					span.hint STATE
 				legend 
-					input(type="text" name="buyAsset-mktValue" readonly="true")
-					span.hint MARKET VALUE
-				legend 
 					input(type="text" name="buyAsset-issuer" readonly="true")
 					span.hint ISSUER
 				legend 
 					input(type="text" name="buyAsset-issueDate" readonly="true")
 					span.hint ISSUE	DATE
+				legend 
+					input(type="text" name="buyAsset-mktValue" readonly="true")
+					span.hint MARKET VALUE
+				legend 
+					input(type="text" name="buyAsset-status" readonly="true")
+					span.hint STATUS
 			br
 			br
 			

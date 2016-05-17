@@ -92,6 +92,14 @@ router.route("/buyasset").get(function (req, res) {
     check_login(res, req);
     res.render('part2', {title: 'PropertyBlox Demo', bag: {setup: setup, e: process.error, session: req.session}});
 });
+router.route("/approve").get(function (req, res) {
+    check_login(res, req);
+    res.render('part2', {title: 'PropertyBlox Demo', bag: {setup: setup, e: process.error, session: req.session}});
+});
+router.route("/approveasset").get(function (req, res) {
+    check_login(res, req);
+    res.render('part2', {title: 'PropertyBlox Demo', bag: {setup: setup, e: process.error, session: req.session}});
+});
 // ============================================================================================================================
 // EY code - end
 // ============================================================================================================================
@@ -118,7 +126,8 @@ function register(req, res) {
     // Determine the user's role from the username, for now
     console.log(TAG, "Validating username and assigning role for:", req.body.username);
     var role = 1;
-    if (req.body.username.toLowerCase().indexOf('auditor') > -1) {
+    //if (req.body.username.toLowerCase().indexOf('auditor') > -1) {
+    if (req.body.username.toLowerCase().indexOf('approver') > -1) {
         role = 3;
     }
 
@@ -157,8 +166,8 @@ function login(req, res) {
             console.log(TAG, "User login successful:", req.body.username);
 
             // Determine the user's role and login by adding the user info to the session.
-            if (req.body.username.toLowerCase().indexOf('auditor') > -1) {
-                req.session.role = 'auditor';
+            if (req.body.username.toLowerCase().indexOf('approver') > -1) {
+                req.session.role = 'approver';
             } else {
                 req.session.role = 'user';
             }
@@ -167,8 +176,8 @@ function login(req, res) {
             req.session.error_msg = null;
 
             // Redirect to the appropriate UI based on role
-            if (req.session.role.toLowerCase() === 'auditor'.toLowerCase()) {
-                res.redirect('/audit');
+            if (req.session.role.toLowerCase() === 'approver'.toLowerCase()) {
+                res.redirect('/approve');
             } else {
                 res.redirect('/wallet');
             }

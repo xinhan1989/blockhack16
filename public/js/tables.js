@@ -4,6 +4,12 @@
 /*eslint-env browser */
 "use strict";
 
+var mAssetStatus = {
+	PENDING:	"Pending",
+	APPROVED: 	"Approved",
+	LOCKED:		"Locked"
+};
+
 function createRow(data) {
     var tr = document.createElement('tr');
 
@@ -84,6 +90,9 @@ function detailAssetButton(disabled, oEntry, sPanelName) {
     	button.classList.add('detailWalletAsset');
     } else if (sPanelName === "buy") {
     	button.classList.add('detailForSaleAsset');
+    } else if (sPanelName === "approve") {
+    	button.classList.add('detailApproveAsset');
+    	//button.classList.add('detailWalletAsset');
     }
 
     var span = document.createElement('span');
@@ -99,11 +108,12 @@ function detailAssetButton(disabled, oEntry, sPanelName) {
     return td;
 }
 
-function detailAssetSellBuyButton(disabled, cusip, invid, quantity, sInputName, sPanelName, bRevoke) {
+function detailAssetSellBuyButton(disabled, cusip, status, invid, quantity, sInputName, sPanelName, bRevoke) {
 	
     var button = document.createElement('button');
     button.setAttribute('type', 'button');
     button.setAttribute('data_cusip', cusip);
+    button.setAttribute('data_status', status);
     button.setAttribute('data_invid', invid);
     button.setAttribute('data_quantity', quantity);
     button.setAttribute('input_name', sInputName);
@@ -247,12 +257,14 @@ function asset_to_entries(asset, oUser, sPanelName) {
     			qty4Sale += asset.forsale[i].quantity;
     			val4Sale += asset.forsale[i].quantity * asset.forsale[i].sellval;
 			}	
-    	} else if (sPanelName === "buy") {
+    	} else if (sPanelName === "buy" || sPanelName === "approve") {
     		qty4Sale += asset.forsale[i].quantity;
     		val4Sale += asset.forsale[i].quantity * asset.forsale[i].sellval;
 		}
     }
-    bValid = (sPanelName === "wallet" && (qtyOwned > 0 || qty4Sale > 0)) || (sPanelName === "buy" && qty4Sale > 0);
+    bValid = (sPanelName === "wallet" && (qtyOwned > 0 || qty4Sale > 0)) || 
+    		 (sPanelName === "buy" && qty4Sale > 0) ||
+    		 (sPanelName === "approve" && asset.status !== mAssetStatus.APPROVED);
     // Create a row for each valid asset
     if (bValid) {
         var entry = {
