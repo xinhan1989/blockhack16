@@ -496,7 +496,7 @@ a, a:visited {
     z-index: 9;
     right: 7px;
     top: 55px;
-    color: #fff;
+    color: #fff !important;
 }
 #loginButton {
     display: block;
@@ -598,6 +598,9 @@ th.header {
     border: 2px solid #222832;
     background: #E2DFDF;
     margin: 10px auto auto;
+    -webkit-animation: loading .8s infinite alternate;
+    -moz-animation: loading .8s infinite alternate;
+    box-shadow: 1px 1px 1px #343D48;
 }
 .modalDialog label {
     width: 60px;
