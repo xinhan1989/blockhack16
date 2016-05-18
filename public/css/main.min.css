@@ -27,7 +27,12 @@ body, li, p, ul {
     position: absolute;
 }
 #navPanel {
-    background: -webkit-gradient(linear,left top,left bottom,from(#5f5d5b),to(#42413e));
+	background: #5f5d5b; /* Old browsers */
+	background: -moz-linear-gradient(top, #5f5d5b 0%, #42413e 100%); /* FF3.6-15 */
+	background: -webkit-linear-gradient(top, #5f5d5b 0%,#42413e 100%); /* Chrome10-25,Safari5.1-6 */
+	background: linear-gradient(to bottom, #5f5d5b 0%,#42413e 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#5f5d5b', endColorstr='#42413e',GradientType=0 ); /* IE6-*/
+    /*background: -webkit-gradient(linear,left top,left bottom,from(#5f5d5b),to(#42413e));*/
 }
 a, abbr, acronym, address, applet, article, aside, audio, b, big, blockquote, body, canvas, caption, center, cite, code, dd, del, details, dfn, div, dl, dt, em, fieldset, figcaption, figure, footer, form, h1, h2, h3, h4, h5, h6, header, hgroup, html, i, iframe, img, ins, kbd, label, legend, li, mark, menu, nav, object, ol, p, pre, q, s, samp, section, small, span, strike, strong, sub, summary, sup, table, tbody, td, tfoot, th, thead, time, tr, tt, u, ul, var, video {
     margin: 0;
