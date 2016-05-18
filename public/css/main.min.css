@@ -612,9 +612,11 @@ th.header {
     padding: 5px 20px 13px;
     border-radius: 10px;
     border: 2px solid #222832;
-    background: #E2DFDF;
+    background: #fff;
     margin: 10px auto auto;
-    box-shadow: 1px 1px 1px #343D48;
+    -webkit-box-shadow: 3px 10px 49px 3px rgba(0,0,0,0.75);
+    -moz-box-shadow: 3px 10px 49px 3px rgba(0,0,0,0.75);
+    box-shadow: 3px 10px 49px 3px rgba(0,0,0,0.75);
 }
 .modalDialog label {
     width: 60px;
