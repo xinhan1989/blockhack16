@@ -499,7 +499,11 @@ a, a:visited {
     display: none;
     margin: 10px auto auto;
     width: 150px;
-    background: -webkit-gradient(linear,left top,left bottom,from(#5f5d5b),to(#42413e));
+    background: #5f5d5b; /* Old browsers */
+	background: -moz-linear-gradient(top, #5f5d5b 0%, #42413e 100%); /* FF3.6-15 */
+	background: -webkit-linear-gradient(top, #5f5d5b 0%,#42413e 100%); /* Chrome10-25,Safari5.1-6 */
+	background: linear-gradient(to bottom, #5f5d5b 0%,#42413e 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#5f5d5b', endColorstr='#42413e',GradientType=0 ); /* IE6-*/
     z-index: 9;
     right: 7px;
     top: 55px;
