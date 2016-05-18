@@ -509,6 +509,11 @@ a, a:visited {
     top: 55px;
     color: #fff !important;
 }
+
+#logoutLink {
+	color:#fff;
+}
+
 #loginButton {
     display: block;
     margin: auto;
