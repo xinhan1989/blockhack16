@@ -124,6 +124,7 @@ table {
     border: 1px;
     border-collapse: collapse;
     font-size: 15px;
+    margin:auto;
 }
 tr {
     margin-bottom: 5px;
