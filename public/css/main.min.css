@@ -798,6 +798,7 @@ button:disabled:hover {
 #linkWraps {
     background: #222832;
     top: initial;
+    font-weight: 600;
 }
 #mainPanel {
     margin-top: 100px;
