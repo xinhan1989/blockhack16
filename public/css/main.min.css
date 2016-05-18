@@ -685,7 +685,7 @@ th.header {
     position: absolute;
     right: 7.5%;
     z-index: 3;
-    top: 0;
+    top: 9px;
     color: #fff;
     cursor: pointer;
     font-size: 13px;
