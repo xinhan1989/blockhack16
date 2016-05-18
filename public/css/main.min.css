@@ -259,10 +259,6 @@ a, a:visited {
     padding-top: 5px;
 }
 
-#imgLogo {
-	margin-left: 1.5%;
-}
-
 #blockdate, #userSelect, .blckLegend, .block, .confirmTrade, .hint, th.header {
     font-weight: 700;
 }
