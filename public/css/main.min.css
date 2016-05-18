@@ -128,7 +128,7 @@ table {
 tr {
     margin-bottom: 5px;
     background: #fff;
-    border-bottom: 6px #343D48 solid;
+    border-bottom: 2px #343D48 solid;
 }
 tr:hover {
     background: orange;
@@ -598,8 +598,6 @@ th.header {
     border: 2px solid #222832;
     background: #E2DFDF;
     margin: 10px auto auto;
-    -webkit-animation: loading .8s infinite alternate;
-    -moz-animation: loading .8s infinite alternate;
     box-shadow: 1px 1px 1px #343D48;
 }
 .modalDialog label {
