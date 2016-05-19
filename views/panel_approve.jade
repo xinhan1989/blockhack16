@@ -11,19 +11,19 @@
 				.modal-content
 					form#approveFilter
 						label(for="asset_name") NAME
-						input#asset_name.approve-filter(type="text" name="name")
+						input#approve_name.approve-filter(type="text" name="name")
 						br
 						label(for="asset_street") STREET
-						input#asset_street.approve-filter(type="text" name="adrStreet")
+						input#approve_street.approve-filter(type="text" name="adrStreet")
 						br
 						label(for="asset_city") CITY
-						input#asset_city.approve-filter(type="text" name="adrCity")
+						input#approve_city.approve-filter(type="text" name="adrCity")
 						br
 						label(for="asset_postcode") PCODE
-						input#asset_postcode.approve-filter(type="text" name="adrPostcode")
+						input#approve_postcode.approve-filter(type="text" name="adrPostcode")
 						br
 						label(for="asset_state") STATE
-						input#asset_state.approve-filter(type="text" name="adrState")
+						input#approve_state.approve-filter(type="text" name="adrState")
 						br
 						a.filter-button(href="#close" title="Close") Close
 						
@@ -35,15 +35,15 @@
 		table#approvesTable.tablesorter
 			thead
 				tr 
-					TH: a.sort-selector(sort="date") DATE
-						span.fa.fa-arrow-up.sort-indicator
-					th: a.sort-selector(sort="name") NAME
-					th: a.sort-selector(sort="adrStreet") STREET
-					th: a.sort-selector(sort="adrCity") CITY
-					th: a.sort-selector(sort="adrPostcode") POSTCODE
-					th: a.sort-selector(sort="adrState") STATE
-					th: a.sort-selector(sort="qtyOwned") QTY
-					th: a.sort-selector(sort="mktval")  MARKET VALUE
-					th: a.sort-selector(sort="issuer")  ISSUER
+					TH: a.sort-selector(sort="date" panel="approve") DATE
+						span.fa.fa-arrow-up.wallet-sort-indicator
+					th: a.sort-selector(sort="name" panel="approve") NAME
+					th: a.sort-selector(sort="adrStreet" panel="approve") STREET
+					th: a.sort-selector(sort="adrCity" panel="approve") CITY
+					th: a.sort-selector(sort="adrPostcode" panel="approve") POSTCODE
+					th: a.sort-selector(sort="adrState" panel="approve") STATE
+					th: a.sort-selector(sort="qtyOwned" panel="approve") QTY
+					th: a.sort-selector(sort="mktval" panel="approve")  MARKET VALUE
+					th: a.sort-selector(sort="issuer" panel="approve")  ISSUER
 					th ACTION
 			tbody#approvesBody

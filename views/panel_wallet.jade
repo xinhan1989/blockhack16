@@ -11,19 +11,19 @@
 				.modal-content
 					form#walletFilter
 						label(for="asset_name") NAME
-						input#asset_name.wallet-filter(type="text" name="name")
+						input#wallet_name.wallet-filter(type="text" name="name")
 						br
 						label(for="asset_street") STREET
-						input#asset_street.wallet-filter(type="text" name="adrStreet")
+						input#wallet_street.wallet-filter(type="text" name="adrStreet")
 						br
 						label(for="asset_city") CITY
-						input#asset_city.wallet-filter(type="text" name="adrCity")
+						input#wallet_city.wallet-filter(type="text" name="adrCity")
 						br
 						label(for="asset_postcode") PCODE
-						input#asset_postcode.wallet-filter(type="text" name="adrPostcode")
+						input#wallet_postcode.wallet-filter(type="text" name="adrPostcode")
 						br
 						label(for="asset_state") STATE
-						input#asset_state.wallet-filter(type="text" name="adrState")
+						input#wallet_state.wallet-filter(type="text" name="adrState")
 						br
 						a.filter-button(href="#close" title="Close") Close
 						
@@ -41,19 +41,19 @@
 		br
 		table#walletsTable.tablesorter
 			thead
-				tr 
-					TH: a.sort-selector(sort="date") DATE
-						span.fa.fa-arrow-up.sort-indicator
-					th: a.sort-selector(sort="name") NAME
-					th: a.sort-selector(sort="adrStreet") STREET
-					th: a.sort-selector(sort="adrCity") CITY
-					th: a.sort-selector(sort="adrPostcode") POSTCODE
-					th: a.sort-selector(sort="adrState") STATE
-					th: a.sort-selector(sort="qtyOwned") MY QTY
-					th: a.sort-selector(sort="valOwned") MY VALUE
-					th: a.sort-selector(sort="qty4Sale") MY QTY FOR SALE
-					th: a.sort-selector(sort="val4Sale") MY VALUE FOR SALE
-					th: a.sort-selector(sort="mktval")  MARKET VALUE
-					th: a.sort-selector(sort="issuer")  ISSUER
+				tr(panel="wallet")
+					TH: a.sort-selector(sort="date" panel="wallet") DATE
+						span.fa.fa-arrow-up.wallet-sort-indicator
+					th: a.sort-selector(sort="name" 		panel="wallet") NAME
+					th: a.sort-selector(sort="adrStreet" 	panel="wallet") STREET
+					th: a.sort-selector(sort="adrCity" 		panel="wallet") CITY
+					th: a.sort-selector(sort="adrPostcode" 	panel="wallet") POSTCODE
+					th: a.sort-selector(sort="adrState" 	panel="wallet") STATE
+					th: a.sort-selector(sort="qtyOwned" 	panel="wallet") MY QTY
+					th: a.sort-selector(sort="valOwned" 	panel="wallet") MY VALUE
+					th: a.sort-selector(sort="qty4Sale" 	panel="wallet") MY QTY FOR SALE
+					th: a.sort-selector(sort="val4Sale" 	panel="wallet") MY VALUE FOR SALE
+					th: a.sort-selector(sort="mktval" 		panel="wallet")  MARKET VALUE
+					th: a.sort-selector(sort="issuer" 		panel="wallet")  ISSUER
 					th ACTION
 			tbody#walletsBody

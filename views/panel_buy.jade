@@ -11,19 +11,19 @@
 				.modal-content
 					form#buyFilter
 						label(for="asset_name") NAME
-						input#asset_name.buy-filter(type="text" name="name")
+						input#buy_name.buy-filter(type="text" name="name")
 						br
 						label(for="asset_street") STREET
-						input#asset_street.buy-filter(type="text" name="adrStreet")
+						input#buy_street.buy-filter(type="text" name="adrStreet")
 						br
 						label(for="asset_city") CITY
-						input#asset_city.buy-filter(type="text" name="adrCity")
+						input#buy_city.buy-filter(type="text" name="adrCity")
 						br
 						label(for="asset_postcode") PCODE
-						input#asset_postcode.buy-filter(type="text" name="adrPostcode")
+						input#buy_postcode.buy-filter(type="text" name="adrPostcode")
 						br
 						label(for="asset_state") STATE
-						input#asset_state.buy-filter(type="text" name="adrState")
+						input#buy_state.buy-filter(type="text" name="adrState")
 						br
 						a.filter-button(href="#close" title="Close") Close
 						
@@ -38,19 +38,19 @@
 		br
 		table#buysTable.tablesorter
 			thead
-				tr 
-					TH: a.sort-selector(sort="date") DATE
-						span.fa.fa-arrow-up.sort-indicator
-					th: a.sort-selector(sort="name") NAME
-					th: a.sort-selector(sort="adrStreet") STREET
-					th: a.sort-selector(sort="adrCity") CITY
-					th: a.sort-selector(sort="adrPostcode") POSTCODE
-					th: a.sort-selector(sort="adrState") STATE
-					th: a.sort-selector(sort="qtyOwned") MY QTY
-					th: a.sort-selector(sort="valOwned") MY VALUE
-					th: a.sort-selector(sort="qty4Sale") QTY FOR SALE
-					th: a.sort-selector(sort="val4Sale") VALUE FOR SALE
-					th: a.sort-selector(sort="mktval")  MARKET VALUE
-					th: a.sort-selector(sort="issuer")  ISSUER
+				tr
+					TH: a.sort-selector(sort="date" panel="buy") DATE
+						span.fa.fa-arrow-up.wallet-sort-indicator
+					th: a.sort-selector(sort="name" panel="buy") NAME
+					th: a.sort-selector(sort="adrStreet" panel="buy") STREET
+					th: a.sort-selector(sort="adrCity" panel="buy") CITY
+					th: a.sort-selector(sort="adrPostcode" panel="buy") POSTCODE
+					th: a.sort-selector(sort="adrState" panel="buy") STATE
+					th: a.sort-selector(sort="qtyOwned" panel="buy") MY QTY
+					th: a.sort-selector(sort="valOwned" panel="buy") MY VALUE
+					th: a.sort-selector(sort="qty4Sale" panel="buy") QTY FOR SALE
+					th: a.sort-selector(sort="val4Sale" panel="buy") VALUE FOR SALE
+					th: a.sort-selector(sort="mktval" panel="buy")  MARKET VALUE
+					th: a.sort-selector(sort="issuer" panel="buy")  ISSUER
 					th ACTION
 			tbody#buysBody

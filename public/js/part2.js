@@ -1,4 +1,4 @@
-/*globals asset_owners_to_entries asset_to_entries sort_reversed detailAssetSellBuyValInput detailAssetSellBuyQtyInput detailAssetSellBuyButton createRow asset_forsale_to_entries detailAssetButton*/
+/*globals asset_owners_to_entries asset_to_entries sort_reversed detailAssetSellBuyValInput detailAssetSellBuyQtyInput detailAssetSellBuyButton createRow asset_forsale_to_entries detailAssetButton sort_assets sort_selected*/
 /*eslint-env browser */
 /* global clear_blocks */
 /* global formatMoney */
@@ -37,24 +37,41 @@ var mAssetStatus = {
 	LOCKED:		"Locked"
 };
 
+var mPanelIdx = {
+	wallet: 0,
+	buy: 1,
+	approve: 2,
+	walletAsset: 0,
+	buyAsset: 1,
+	approveAsset: 2
+};
 var asset_panels = [
     {
         name: "wallet",
         formID: "walletFilter",
         tableID: "#walletsBody",
-        filterPrefix: "wallet_"
+        filterPrefix: "wallet_",
+        sort_selected: sort_assets.date,
+        sort_reversed: true,
+        filter: {}
     },
     {
         name: "buy",
         formID: "buyFilter",
         tableID: "#buysBody",
-        filterPrefix: "buy_"
+        filterPrefix: "buy_",
+        sort_selected: sort_assets.date,
+        sort_reversed: true,
+        filter: {}
     },
     {
         name: "approve",
         formID: "approveFilter",
         tableID: "#approvesBody",
-        filterPrefix: "approve_"
+        filterPrefix: "approve_",
+        sort_selected: sort_assets.date,
+        sort_reversed: true,
+        filter: {}
     }
 ];
 var asset_detail_panels = [
@@ -454,32 +471,22 @@ $(document).on('ready', function () {
         }
     });
 
-    // Filter the trades whenever the filter modal changes
-    $(".trade-filter").keyup(function () {
-        "use strict";
-        console.log("Change in trade filter detected.");
-        processFilterForm(panels[0]);
-    });
-    $(".audit-filter").keyup(function () {
-        "use strict";
-        console.log("Change in audit filter detected.");
-        processFilterForm(panels[1]);
-    });
+    // Filter the assets whenever the filter modal changes
     //EY <-
     $(".wallet-filter").keyup(function () {
         "use strict";
         console.log("Change in wallet filter detected.");
-        processFilterForm(asset_panels[0]);
+        processFilterForm(asset_panels[mPanelIdx.wallet]);
     });
     $(".buy-filter").keyup(function () {
         "use strict";
         console.log("Change in buy filter detected.");
-        processFilterForm(asset_panels[0]);
+        processFilterForm(asset_panels[mPanelIdx.buy]);
     });
     $(".approve-filter").keyup(function () {
         "use strict";
         console.log("Change in approve filter detected.");
-        processFilterForm(asset_panels[0]);
+        processFilterForm(asset_panels[mPanelIdx.approve]);
     });
     //EY ->
 
@@ -487,35 +494,33 @@ $(document).on('ready', function () {
     $('.sort-selector').click(function () {
         "use strict";
         var sort = $(this).attr('sort');
+        var sPanelName = $(this).attr('panel');
 
         // Clear any sort direction arrows
-        $('span').remove('.sort-indicator');
+        var sSortIndicatorClass = sPanelName + "-sort-indicator";
+        $('span').remove("." + sSortIndicatorClass);
 
         // Clicking the column again should reverse the sort
-        if(sort_papers[sort] === sort_selected) {
+        if(sort_assets[sort] === asset_panels[mPanelIdx[sPanelName]].sort_selected) {
             console.log("Reversing the table");
-            sort_reversed = !sort_reversed;
+            asset_panels[mPanelIdx[sPanelName]].sort_reversed = !asset_panels[mPanelIdx[sPanelName]].sort_reversed;
         }
-        else sort_reversed = false;
+        else asset_panels[mPanelIdx[sPanelName]].sort_reversed = false;
 
         // Add the appropriate arrow to the current selector
-        var arrow_icon = sort_reversed ? 'fa-arrow-up' : 'fa-arrow-down';
+        var arrow_icon = asset_panels[mPanelIdx[sPanelName]].sort_reversed ? 'fa-arrow-up' : 'fa-arrow-down';
         var span = document.createElement('span');
         span.classList.add('fa');
         span.classList.add(arrow_icon);
-        span.classList.add('sort-indicator');
+        span.classList.add(sSortIndicatorClass);
         $(this).append(span);
 
         // Change to the sort corresponding to that column
-        sort_selected = sort_papers[sort];
+        asset_panels[mPanelIdx[sPanelName]].sort_selected = sort_assets[sort];
         console.log("Sorting by:", sort);
-        for (var i in panels) {
-            build_trades(bag.papers, panels[i]);
-        }
         //EY <-
-        for (var i in asset_panels) {
-            build_assets(bag.assets, asset_panels[i]);
-        }
+        //Build assets for the corresponding panel only
+       	if (sPanelName) build_assets(bag.assets, asset_panels[mPanelIdx[sPanelName]]);
         //EY ->
     });
 
@@ -558,7 +563,7 @@ $(document).on('ready', function () {
 				for (var i in bag.assets) {
 				
 					if (bag.assets[i].cusip === sCusip) {
-						build_asset_details(bag.assets[i], asset_detail_panels[0]);	
+						build_asset_details(bag.assets[i], asset_detail_panels[mPanelIdx.walletAsset]);	
 						return;
 					}
 
@@ -577,7 +582,7 @@ $(document).on('ready', function () {
 				for (var i in bag.assets) {
 				
 					if (bag.assets[i].cusip === sCusip) {
-						build_asset_details(bag.assets[i], asset_detail_panels[2]);	
+						build_asset_details(bag.assets[i], asset_detail_panels[mPanelIdx.approveAsset]);	
 						return;
 					}
 
@@ -596,7 +601,7 @@ $(document).on('ready', function () {
 				for (var i in bag.assets) {
 				
 					if (bag.assets[i].cusip === sCusip) {
-						build_asset_details(bag.assets[i], asset_detail_panels[1]);	
+						build_asset_details(bag.assets[i], asset_detail_panels[mPanelIdx.buyAsset]);	
 						return;
 					}
 
@@ -807,7 +812,7 @@ function build_trades(papers, panelDesc) {
 
             if (entries[i].quantity > 0) {													//cannot buy when there are none
 
-                if (excluded(entries[i], filter)) {
+                if (excluded(entries[i], panelDesc.filter)) {
                     var style;
                     if (user.name.toLowerCase() === entries[i].owner.toLowerCase()) {
                         //cannot buy my own stuff
@@ -946,7 +951,7 @@ function build_assets(assets, panelDesc) {
     	
         // If no panel is given, assume this is the wallet panel
         if (!panelDesc) {
-            panelDesc = asset_panels[0];
+            panelDesc = asset_panels[mPanelIdx.wallet];
         }    	
 
         // Break the assets down into entries
@@ -959,8 +964,8 @@ function build_assets(assets, panelDesc) {
         }
         console.log("Displaying", assets.length, "assets as", entries.length, "entries");
       
-        entries.sort(sort_selected);
-        if (sort_reversed) entries.reverse();
+        entries.sort(panelDesc.sort_selected);
+        if (panelDesc.sort_reversed) entries.reverse();
 
         // Display each entry as a row in the table
         var rows = [];
@@ -971,7 +976,7 @@ function build_assets(assets, panelDesc) {
 			// Add together total amount monetary value of assets (includes ForSale value as well, as it still belongs to the owner)
             totalAssetValue = totalAssetValue + entries[i].valOwned + entries[i].val4Sale; 
 
-            if (excluded(entries[i], filter)) {
+            if (excluded(entries[i], panelDesc.filter)) {
 
                 // Create a row for each valid asset
                 var data = [];
@@ -981,7 +986,7 @@ function build_assets(assets, panelDesc) {
 	                    escapeHtml(entries[i].name.toUpperCase()),
 	                    escapeHtml(entries[i].adrStreet),
 	                    escapeHtml(entries[i].adrCity),
-	                    escapeHtml(entries[i].adrPostcode),
+	                    entries[i].adrPostcode,
 	                    escapeHtml(entries[i].adrState),
 	                    entries[i].quantity,
 	                    formatMoney(entries[i].mktval),
@@ -1087,7 +1092,7 @@ function build_asset_details(oAsset, panelDesc) {
 		
 		// If no panel is given, assume this is the wallet panel
 	    if (!panelDesc) {
-	     	panelDesc = asset_detail_panels[0];
+	     	panelDesc = asset_detail_panels[mPanelIdx.walletAsset];
 	    }  
 	    
 	    // Break the assets down into entries
@@ -1204,21 +1209,19 @@ function showDetailPanel(show){
 var filter = {};
 
 /**
- * Describes all the fields that describe a trade.  Used to create
+ * Describes all the fields that describe a asset.  Used to create
  * a filter that can be used to control which trades get shown in the
  * table.
  * @type {string[]}
  */
 var names = [
     "cusip",
-    "ticker",
-    "par",
-    "qty",
-    "discount",
-    "maturity",
-    "issuer",
-    "owner",
-    "company"
+    "name",
+    "street",
+    "city",
+    "postcode",
+    "state",
+    "issuer"
 ];
 
 /**
@@ -1236,7 +1239,7 @@ function processFilterForm(panelDesc) {
     console.log(form.getElementsByTagName("input"));
 
     // Reset the filter parameters
-    filter = {};
+    panelDesc.filter = {};
 
     // Build the filter based on the form inputs
     for (var i in names) {
@@ -1246,17 +1249,17 @@ function processFilterForm(panelDesc) {
         var id = panelDesc.filterPrefix + name;
 
         if (form[id] && form[id].value !== "") {
-            filter[name] = form[id].value;
+            panelDesc.filter[name] = form[id].value;
         }
     }
 
     console.log("New filter parameters: " + JSON.stringify(filter));
-    console.log("Rebuilding paper list");
-    build_trades(bag.papers, panelDesc);
+    console.log("Rebuilding asset list");
+    build_assets(bag.assets, panelDesc);
 }
 
 /**
- * Validates a trade object against a given set of filters.
+ * Validates an asset object against a given set of filters.
  * @param entry The object to be validated.
  * @param filter The filter object to validate the trade against.
  * @returns {boolean} True if the trade is valid according to the filter, false otherwise.
@@ -1264,11 +1267,12 @@ function processFilterForm(panelDesc) {
 function excluded(entry, filter) {
     "use strict";
 
-    if (filter.owner && filter.owner !== "" && entry.owner.company.toUpperCase().indexOf(filter.owner.toUpperCase()) == -1) return false;
-
+    if (filter.name && filter.name !== "" && entry.name.toUpperCase().indexOf(filter.name.toUpperCase()) == -1) return false;
     if (filter.issuer && filter.issuer !== "" && entry.issuer.toUpperCase().indexOf(filter.issuer.toUpperCase()) == -1) return false;
-
-    if (filter.ticker && filter.ticker !== "" && entry.ticker.toUpperCase().indexOf(filter.ticker.toUpperCase()) == -1) return false;
+    if (filter.street && filter.street !== "" && entry.adrStreet.toUpperCase().indexOf(filter.street.toUpperCase()) == -1) return false;
+    if (filter.city && filter.city !== "" && entry.adrCity.toUpperCase().indexOf(filter.city.toUpperCase()) == -1) return false;
+    if (filter.postcode && filter.postcode !== "" && entry.adrPostcode.toUpperCase().indexOf(filter.postcode.toUpperCase()) == -1) return false;
+    if (filter.state && filter.state !== "" && entry.adrState.toUpperCase().indexOf(filter.state.toUpperCase()) == -1) return false;
 
     // Must be a valid trade if we reach this point
     return true;
