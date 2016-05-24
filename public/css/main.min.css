@@ -1,27 +1,26 @@
 body, li, p, ul {
     padding: 0;
 }
-#headerPanel, button:hover, input[type=submit]:hover, input[type=button]:hover {
+span\:a:hover {
+	cursor: pointer;
+    color: #22697A;
+}
+#headerPanel, button:hover, input[type=submit]:hover, input[type=button]:hover, .iconLink:hover {
     background: #fff;
 }
 #linkWraps, table, td, th, tr {
     text-align: center;
 }
 #navPanel, .floatFixer, body, table {
-
     margin-left:2.5%;
     width: 95%
-
 }
 #linkWraps {
     width: 85%
-
-
 }
 #contentPanel, html {
     position: relative;
 }
-
 
 #blockdate, #description, #linkWraps {
     position: absolute;
@@ -182,7 +181,12 @@ button:focus, input:focus, select:focus {
     outline: 0!important;
     border-color: #fff!important;
 }
-input[type=text], input[type=password], input[type=number], select {
+.btnAddImgUrl {
+    margin: 5px;
+    min-width: 5px;
+    padding-bottom: 3px;
+}
+input[type=text], input[type=password], input[type=number], input[type=url], select {
     padding: 3px 10px;
     margin: 5px;
     color: #000;
@@ -834,8 +838,10 @@ button {
     width: 100%;
     margin-top: 5px;
 }
+}
 }@media (max-width:475px) {
     #description {
     position: initial;
 }
 }
+/*---- Asset Image Modal ---- */

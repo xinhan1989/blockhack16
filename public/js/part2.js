@@ -31,6 +31,10 @@ var panels = [
 ];
 
 //EY <-----------------
+var mUrlType = {
+	WEB: "web",
+	IMG: "img"
+};
 var mAssetStatus = {
 	PENDING:	"Pending",
 	APPROVED: 	"Approved",
@@ -162,10 +166,11 @@ $(document).on('ready', function () {
     	
         if (user.username) {
         	
-        	var sId  		= user.name + Date.now().toString() + randStr(10);
-        	var nQty 		= Number($("input[name='qty']").val());
-        	var fMktValue	= Number($("input[name='mktValue']").val());
-        	var sName 		= escapeHtml($("input[name='name']").val()).trim();
+        	var sId  	  = user.name + Date.now().toString() + randStr(10);
+        	var nQty 	  = Number($("input[name='qty']").val());
+        	var fMktValue = Number($("input[name='mktValue']").val());
+        	var sName 	  = escapeHtml($("input[name='name']").val()).trim();
+        	var aUrlLinks = [];
         	
         	//Quantity/Value validations
         	if (fMktValue <= 0) {
@@ -186,6 +191,24 @@ $(document).on('ready', function () {
         		showErrorMessage("Name is a mandatory parameter");
         		return;
         	}
+        	//Url Links
+        	var sUrl = escapeHtml($("input[name='urlWeb']").val()).trim();
+        	var oUrlLink = {url: "", urlType: ""};
+        	if (sUrl) {
+        		oUrlLink.url = sUrl;
+        		oUrlLink.urlType = mUrlType.WEB;
+        		aUrlLinks.push(oUrlLink);
+        	}
+        	var aInpImgUrl = $(".inpImgUrl");
+        	for (var i=0; i<aInpImgUrl.length;i++) {
+        		
+        		sUrl = escapeHtml(aInpImgUrl.val()).trim();
+        		if (sUrl) {
+	        		oUrlLink.url = sUrl;
+	        		oUrlLink.urlType = mUrlType.IMG;
+	        		aUrlLinks.push(oUrlLink);
+	        	}
+        	}
         	
         	//PRepare asset object
             var obj = {
@@ -199,9 +222,11 @@ $(document).on('ready', function () {
 				    adrState:    escapeHtml($("select[name='adrState']").val()),
 				    quantity:    nQty, 
 				    mktval:      fMktValue,
+				    status:		 mAssetStatus.PENDING,
 				    buyval:      fMktValue,
 				    owner:       [], //The owner is being added on chaincode side
 				    forsale:     [],
+				    urlLink:	 aUrlLinks,		       
 				    issuer:      user.name,
                     issueDate:   Date.now().toString()
                 },
@@ -259,6 +284,65 @@ $(document).on('ready', function () {
             }
         }
         return false;
+    });
+    
+    //Add additional input control for image url
+    $(document).on("click", ".btnAddImgUrl", function () {
+    	
+		//Get parent legend control
+		var $Parent = $("#groupImgUrl");
+		var oParent = $Parent.get(0);
+		
+		//Creating the screen elements
+		var oLegend = document.createElement('legend');
+		
+		var oInput = document.createElement('input');
+		oInput.classList.add('inpImgUrl');
+		oInput.setAttribute('type', 'url');
+		oInput.setAttribute('urlType', 'img');
+
+		var oSpan = document.createElement('span');
+    	oSpan.classList.add('hint');
+   		oSpan.innerHTML = 'IMAGE URL';
+   		
+		//var oButton = document.createElement('button');
+		//oButton.setAttribute('type', 'button');
+		//oButton.classList.add('btnAddImgUrl');
+		
+		var oBtnSpan = document.createElement('span:a');
+		oBtnSpan.classList.add('fa');
+		oBtnSpan.classList.add('fa-plus');
+		oBtnSpan.classList.add('btnAddImgUrl');
+		
+		//Removing a previuos add image url <span:a> element from the screen
+		$('span\\:a').remove(".btnAddImgUrl");
+		
+		//Putting all together
+		oSpan.appendChild(oBtnSpan);
+		oLegend.appendChild(oInput);
+		oLegend.appendChild(oSpan);
+		oParent.appendChild(oLegend);
+		
+    	return;
+
+    });
+    
+    //Show images
+    $(document).on("click", ".btnShowImg", function () {
+    	
+    	// Get the modal
+		var oModal = document.getElementById('assetImgModal');
+		// When the user clicks the button, open the modal 
+    	oModal.style.display = "block";
+    });    
+    
+    //Go to the website
+    $(document).on("click", ".btnGo2Web", function () {
+    	
+    	var urlLink = $(this).attr('urlLink');
+    	if (urlLink) {
+    		window.open(urlLink); 
+		}
     });
     
     //walletAssetSell
@@ -1068,6 +1152,27 @@ function build_asset_details(oAsset, panelDesc) {
 	$("input[name='" + panelDesc.name + "-adrState']").val(oAsset.adrState);
 	$("input[name='" + panelDesc.name + "-issuer']").val(oAsset.issuer);
 	$("input[name='" + panelDesc.name + "-issueDate']").val(formatDate(Number(oAsset.issueDate), '%d/%M/%Y %I:%m%P'));
+	
+	// GO TO WEB/SHOW IMAGE buttons
+	var aUrlLinks = oAsset.urlLink || [];
+	var btnGo2Web  = $("button[name='" + panelDesc.name + "-btnGo2Web']").get(0);
+	var btnShowImg = $("button[name='" + panelDesc.name + "-btnShowImg']").get(0);
+	var isGo2Web = false, isShowImg = false;
+	if (btnGo2Web) {
+		for (var i=0;aUrlLinks.length;i++) {
+			if (aUrlLinks[i].urlType === mUrlType.WEB) {
+				btnGo2Web.setAttribute('urlLink', aUrlLinks[i].url);
+				isGo2Web = true;
+			} else if (aUrlLinks[i].urlType === mUrlType.IMG) {
+				btnShowImg.setAttribute('cusip', oAsset.cusip);
+				isShowImg = true;
+			}
+		}
+		btnGo2Web.disabled = !isGo2Web;
+		//btnShowImg.disabled = !isShowImg;
+		btnShowImg.disabled = false; //TODO
+	}
+
 	
 	var sStatus = mAssetStatus.PENDING;
 	if (oAsset.status) sStatus = oAsset.status;

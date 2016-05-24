@@ -2,6 +2,11 @@
 	h1 My Asset
 	hr
 	
+	br
+	// --------------- Modal Window - Show Asset Images
+	include ./modal_assetimg.jade
+	
+	// --------------- Main Asset Window
 	#innerWrap
 		span.fa.fa-home(style="font-size: 250px; float:left;")
 	
@@ -34,8 +39,16 @@
 				legend 
 					input(type="text" name="walletAsset-status" readonly="true")
 					span.hint STATUS
+				legend
+					button(type="button" name="walletAsset-btnShowImg" style="margin:5px;").btnShowImg
+						span.fa.fa-picture-o &nbsp;&nbsp;
+						span SHOW IMAGES
+					button(type="button" name="walletAsset-btnGo2Web" style="margin:5px;").btnGo2Web
+						span.fa.fa-external-link &nbsp;&nbsp;
+						span GO TO WEBSITE
 			br
 			br
+	
 			
 		table#walletAssetTable
 			thead

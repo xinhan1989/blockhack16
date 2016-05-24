@@ -14,7 +14,15 @@ type Asset struct {
     IssueDate   string     `json:"issueDate"`
     Status      string     `json:"status"`    //Approved||Pending
     
-    mktvalPerToken //extended
+    Links       []UrlLnk   `json:"urlLink"`
+
+    //extended on nodejs side
+    mktvalPerToken 
+}
+
+type UrlLnk struct {
+    Url         string   `json:"url"`
+    UrlType     string   `json:"urlType"`
 }
 
 type Owner struct {

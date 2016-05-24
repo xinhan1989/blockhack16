@@ -36,6 +36,14 @@
 				legend 
 					input(type="number" name="mktValue" placeholder="AUD")
 					span.hint MARKET VALUE
+				legend 
+					input(type="url" name="urlWeb" urlType="web")
+					span.hint WEB URL
+				legend#groupImgUrl 
+					legend 
+						input(type="url" urlType="img").inpImgUrl
+						span.hint IMAGE URL
+							span:a.fa.fa-plus.btnAddImgUrl
 				
 				legend
 					button(type="button" style="margin:5px;")#submitasset
