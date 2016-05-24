@@ -193,8 +193,8 @@ $(document).on('ready', function () {
         	}
         	//Url Links
         	var sUrl = escapeHtml($("input[name='urlWeb']").val()).trim();
-        	var oUrlLink = {url: "", urlType: ""};
         	if (sUrl) {
+        		var oUrlLink = {url: "", urlType: ""};
         		oUrlLink.url = sUrl;
         		oUrlLink.urlType = mUrlType.WEB;
         		aUrlLinks.push(oUrlLink);
@@ -202,8 +202,9 @@ $(document).on('ready', function () {
         	var aInpImgUrl = $(".inpImgUrl");
         	for (var i=0; i<aInpImgUrl.length;i++) {
         		
-        		sUrl = escapeHtml(aInpImgUrl.val()).trim();
+        		sUrl = escapeHtml(aInpImgUrl[i].value).trim();
         		if (sUrl) {
+        			var oUrlLink = {url: "", urlType: ""}; //objects are being assigned by reference, create new object intentially 
 	        		oUrlLink.url = sUrl;
 	        		oUrlLink.urlType = mUrlType.IMG;
 	        		aUrlLinks.push(oUrlLink);
@@ -333,8 +334,29 @@ $(document).on('ready', function () {
     	// Get the modal
 		var oModal = document.getElementById('assetImgModal');
 		// When the user clicks the button, open the modal 
-    	oModal.style.display = "block";
+		if (oModal) {
+    		oModal.style.display = "block";
+		}
     });    
+    //Close images modal window 
+    $(document).on("click", ".modalImg-Close", function () {
+    	
+    	// Get the modal
+		var oModal = document.getElementById('assetImgModal');
+		// When the user clicks on <span> (x), close the modal 
+		if (oModal) {
+			oModal.style.display = "none";
+		}    	
+    });     
+	// When the user clicks anywhere outside of the modal, close it
+	window.onclick = function(oEvent) {
+		
+		// Get the modal
+		var oModal = document.getElementById('assetImgModal');
+	    if (oModal && oEvent.target === oModal) {
+	        oModal.style.display = "none";
+	    }
+	};   
     
     //Go to the website
     $(document).on("click", ".btnGo2Web", function () {
@@ -1159,7 +1181,7 @@ function build_asset_details(oAsset, panelDesc) {
 	var btnShowImg = $("button[name='" + panelDesc.name + "-btnShowImg']").get(0);
 	var isGo2Web = false, isShowImg = false;
 	if (btnGo2Web) {
-		for (var i=0;aUrlLinks.length;i++) {
+		for (var i = 0; i < aUrlLinks.length; i++) {
 			if (aUrlLinks[i].urlType === mUrlType.WEB) {
 				btnGo2Web.setAttribute('urlLink', aUrlLinks[i].url);
 				isGo2Web = true;
@@ -1168,9 +1190,8 @@ function build_asset_details(oAsset, panelDesc) {
 				isShowImg = true;
 			}
 		}
-		btnGo2Web.disabled = !isGo2Web;
-		//btnShowImg.disabled = !isShowImg;
-		btnShowImg.disabled = false; //TODO
+		btnGo2Web.disabled  = !isGo2Web;
+		btnShowImg.disabled = !isShowImg;
 	}
 
 	
