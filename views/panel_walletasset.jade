@@ -4,7 +4,9 @@
 	
 	br
 	// --------------- Modal Window - Show Asset Images
-	include ./modal_assetimg.jade
+	//include ./modal_assetimg.jade
+	#walletAssetImgModal.modalImg
+		span.modalImg-close(modal_id="walletAssetImgModal") x
 	
 	// --------------- Main Asset Window
 	#innerWrap
@@ -40,7 +42,7 @@
 					input(type="text" name="walletAsset-status" readonly="true")
 					span.hint STATUS
 				legend
-					button(type="button" name="walletAsset-btnShowImg" style="margin:5px;").btnShowImg
+					button(type="button" name="walletAsset-btnShowImg" style="margin:5px;" modal_id="walletAssetImgModal").btnShowImg
 						span.fa.fa-picture-o &nbsp;&nbsp;
 						span SHOW IMAGES
 					button(type="button" name="walletAsset-btnGo2Web" style="margin:5px;").btnGo2Web

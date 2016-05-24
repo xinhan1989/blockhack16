@@ -2,6 +2,12 @@
 	h1 Asset for Sale
 	hr
 	
+	br
+	// --------------- Modal Window - Show Asset Images
+	#buyAssetImgModal.modalImg
+		span.modalImg-close(modal_id="buyAssetImgModal") x
+	
+	// --------------- Main Asset Window
 	#innerWrap
 		span.fa.fa-home(style="font-size: 250px; float:left;")
 		
@@ -34,6 +40,13 @@
 				legend 
 					input(type="text" name="buyAsset-status" readonly="true")
 					span.hint STATUS
+				legend
+					button(type="button" name="buyAsset-btnShowImg" style="margin:5px;" modal_id="buyAssetImgModal").btnShowImg
+						span.fa.fa-picture-o &nbsp;&nbsp;
+						span SHOW IMAGES
+					button(type="button" name="buyAsset-btnGo2Web" style="margin:5px;").btnGo2Web
+						span.fa.fa-external-link &nbsp;&nbsp;
+						span GO TO WEBSITE
 			br
 			br
 			

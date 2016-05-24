@@ -332,29 +332,56 @@ $(document).on('ready', function () {
     $(document).on("click", ".btnShowImg", function () {
     	
     	// Get the modal
-		var oModal = document.getElementById('assetImgModal');
-		// When the user clicks the button, open the modal 
-		if (oModal) {
-    		oModal.style.display = "block";
+		var oModal = document.getElementById($(this).attr('modal_id'));
+		if (!oModal) return;
+    	
+    	//Remove all image elements
+    	$('img').remove(".modalImg-content");
+    	//Get CUSIP of selected asset
+    	var sCusip = $(this).attr('cusip');
+    	var aUrlLinks = [];
+    	//Read related asset data
+    	if (sCusip) {
+			for (var i in bag.assets) {
+				if (bag.assets[i].cusip === sCusip) {
+					aUrlLinks = bag.assets[i].urlLink;
+					break;
+				}
+			}
 		}
+		//Create image elements
+		var bShowModal = false;
+    	for (var i = 0; i < aUrlLinks.length; i++) {
+    		if (aUrlLinks[i].url && aUrlLinks[i].urlType === mUrlType.IMG) {
+    			var oImg = document.createElement('img');
+    			oImg.classList.add('modalImg-content');
+    			oImg.src = aUrlLinks[i].url;
+    			oModal.appendChild(oImg);
+    			bShowModal = true;
+    		}
+    	}		
+		// When the user clicks the button, open the modal 
+		if (bShowModal) oModal.style.display = "block";
     });    
     //Close images modal window 
-    $(document).on("click", ".modalImg-Close", function () {
+    function closeAssetImgModal (sModalId) {
     	
     	// Get the modal
-		var oModal = document.getElementById('assetImgModal');
+		var oModal = document.getElementById(sModalId);
 		// When the user clicks on <span> (x), close the modal 
 		if (oModal) {
 			oModal.style.display = "none";
-		}    	
+		}   
+    };
+    $(document).on("click", ".modalImg-close", function () {
+    	closeAssetImgModal($(this).attr('modal_id'));  	
     });     
 	// When the user clicks anywhere outside of the modal, close it
 	window.onclick = function(oEvent) {
 		
 		// Get the modal
-		var oModal = document.getElementById('assetImgModal');
-	    if (oModal && oEvent.target === oModal) {
-	        oModal.style.display = "none";
+	    if (oEvent && oEvent.target && oEvent.target.className === "modalImg") {
+	        oEvent.target.style.display = "none"; 
 	    }
 	};   
     
@@ -661,6 +688,7 @@ $(document).on('ready', function () {
      //View Wallet Asset Details
     $(document).on("click", ".detailWalletAsset", function () {
         if (user.username) {
+        	closeAssetImgModal(); 
             console.log('wallet asset details...');
 			showDetailPanel("walletasset");
 			//Build data
@@ -680,6 +708,7 @@ $(document).on('ready', function () {
     //View Asset Details for Approval
     $(document).on("click", ".detailApproveAsset", function () {
         if (user.username) {
+        	closeAssetImgModal();
             console.log('approve asset details...');
 			showDetailPanel("approveasset");
 			//Build data
@@ -699,6 +728,7 @@ $(document).on('ready', function () {
     //View For Sale Asset Details
     $(document).on("click", ".detailForSaleAsset", function () {
         if (user.username) {
+        	closeAssetImgModal();
             console.log('for sale asset details...');
 			showDetailPanel("buyasset");
 			//Build data
